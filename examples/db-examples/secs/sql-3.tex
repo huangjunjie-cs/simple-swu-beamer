@@ -1,0 +1,444 @@
+\subsection{查询语法}
+\begin{frame}[allowframebreaks, fragile]{查询语句格式}
+\begin{block}{查询语法}
+\begin{lstlisting}[language=SQL]
+SELECT [ALL|DISTINCT] <目标列表达式>
+                                       [，<目标列表达式>] …
+FROM <表名或视图名>[， <表名或视图名> ] …
+[ WHERE <条件表达式> ]
+[ GROUP BY <列名1> [ HAVING <条件表达式> ] ]
+[ ORDER BY <列名2> [ ASC|DESC ] ]；
+
+\end{lstlisting}
+\end{block}
+\begin{itemize}
+    \item SELECT子句：指定要显示的属性列
+    \item FROM子句：指定查询对象(基本表或视图)
+    \item WHERE子句：指定查询条件
+    \item GROUP BY子句：对查询结果按指定列的值分组，该属性列值相等的元组为一个组。通常会在每组中作用集函数
+    \item HAVING短语：筛选出只有满足指定条件的组
+    \item ORDER BY子句：对查询结果表按指定列值的升序或降序排序 
+\end{itemize}
+\end{frame}
+
+
+\subsection{单表查询}
+\begin{frame}[fragile]{单表查询}
+\begin{itemize}
+    \item 查询仅涉及一个表，是一种最简单的查询操作
+    \begin{itemize}
+        \item 选择表中的若干列
+        \item 选择表中的若干元组
+        \item 对查询结果排序
+        \item 使用集函数
+        \item 对查询结果分组  
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{选择表中的若干列}
+\begin{itemize}
+    \item 查询全体学生的学号与姓名
+    \item 查询全体学生的姓名、学号、所在系
+    \item 查询全体学生的详细记录
+\end{itemize}
+
+\begin{block}{单表查询例子}
+\begin{lstlisting}[language=SQL]
+SELECT Sno, Sname FROM Student;
+SELECT Sname，Sno，Sdept FROM Student；
+SELECT * FROM Student； 
+
+Sno       Sname  Ssex  Sage  Sdept
+--------  -----  ----  ----  -----
+20231521  李勇     男     20    CS
+20231522  刘晨     女     19    CS
+20231523  王敏     女     18    MA
+20231525  张立     男     19    AI
+
+\end{lstlisting}
+\end{block}
+\end{frame}
+
+
+
+
+\begin{frame}[fragile]{选择表中的若干列}
+\begin{itemize}
+    \item 查全体学生的姓名及其出生年份
+    \item 查询全体学生的姓名、出生年份和所在系。在出生年份前面增加一个说明，在系名称后面增加一个“系”作为表示 (Hint: AS 别名)
+\end{itemize}
+
+\begin{block}{单表查询例子}
+\begin{lstlisting}[language=SQL]
+SELECT Sname,2023-Sage FROM Student;
+SELECT Sname, 2023-Sage AS  '出生年份',  Sdept || '系' AS '院系' FROM Student;
+
+Sname  出生年份  院系
+-----  ----  ---
+李勇     2003  CS系
+刘晨     2004  CS系
+王敏     2005  MA系
+张立     2004  AI系
+
+\end{lstlisting}
+\end{block}
+\end{frame}
+
+
+\begin{frame}[fragile]{选择表中的若干元组}
+\begin{itemize}
+    \item 消除取值重复的行
+    \begin{itemize}
+        \item 查询选修了课程的学生学号
+    \end{itemize}
+    % \item 查询满足条件的元组 
+    % \begin{itemize}
+    %     \item 查询选修了课程的学生学号
+    % \end{itemize}
+\end{itemize}
+
+\begin{block}{查询例子}
+\begin{lstlisting}[language=SQL]
+SELECT Sno FROM SC;
+Sno
+--------
+20231521
+20231521
+20231521
+20231522
+20231522
+
+SELECT DISTINCT Sno FROM SC;
+Sno
+--------
+20231521
+20231522
+
+\end{lstlisting}
+\end{block}
+\end{frame}
+
+
+\begin{frame}[fragile]{选择表中的若干元组}
+\begin{itemize}
+    \item 查询满足条件的元组 (WHERE)
+    \begin{itemize}
+        \item 运算符：=，>，<，>=，<=，!= 或 <>，!>，!<
+        \item 关键词：NOT / BETWEEN …  AND / IN
+    \begin{itemize}
+        \item 查询所有年龄在20岁以下的学生姓名及其年龄
+        \item 查询年龄在20~23岁（包括20岁和23岁）
+        \item 查询年龄不在20~23岁之间的学生姓名、系别和年龄
+        \item 查询信息系（IS）和计算机科学系（CS）学生的姓名和性别。
+    \end{itemize}
+    \end{itemize}
+    
+\end{itemize}
+
+\begin{block}{查询例子}
+\begin{lstlisting}[language=SQL]
+SELECT Sname, Sage FROM Student WHERE Sage < 20;
+SELECT Sname, Sdept, Sage FROM Student WHERE Sage BETWEEN 20 AND 23; 
+SELECT Sname, Sdept, Sage FROM Student  WHERE Sage NOT BETWEEN 20 AND 23；
+SELECT Sname, Ssex FROM  Student WHERE Sdept IN ( 'IS', 'CS'  );
+\end{lstlisting}
+\end{block}
+\end{frame}
+
+
+
+\begin{frame}[fragile]{选择表中的若干元组}
+\begin{itemize}
+    \item 字符串匹配：  [NOT] LIKE  ‘<匹配串>’ 
+    \begin{itemize}
+    \item \% (百分号)  代表任意长度（长度可以为0）的字符串
+    \item \_ (下横线)  代表任意单个字符
+    \begin{itemize}
+        \item 查询所有姓刘学生的姓名、学号和性别
+        \item 查询姓“刘"且全名为三个汉字的学生的姓名
+        \item 查询所有不姓刘的学生姓名
+    \end{itemize}
+    \end{itemize}
+    \item 使用谓词 IS NULL 或 IS NOT NULL
+\begin{itemize}
+        \item 有些课没有先修课程。查询没有先修课程的课程名称
+    \end{itemize}
+\end{itemize}
+
+\begin{block}{查询例子}
+\begin{lstlisting}[language=SQL]
+SELECT Sname, Sno, Ssex FROM Student WHERE Sname LIKE '刘%';
+SELECT Sname, Sno, Ssex FROM Student WHERE Sname LIKE '刘__';
+SELECT Sname, Sno, Ssex FROM Student WHERE Sname NOT LIKE '刘%';
+SELECT Cname From Course WHERE Cpno IS NULL;
+
+\end{lstlisting}
+\end{block}
+\end{frame}
+
+
+\begin{frame}[fragile]{选择表中的若干元组}
+\begin{itemize}
+    \item 对查询结果进行排序  (ORDER BY) 
+    \begin{itemize}
+        \item 可以按一个或多个属性列排序
+        \item 升序：ASC；降序：DESC；缺省值为升序
+        \begin{itemize}
+        \item 查询选修了3号课程的学生的学号及其成绩，查询结果按分数降序排列
+        \item 查询全体学生情况，查询结果按所在系的系号升序排列，同一系中的学生按年龄降序排列
+        \end{itemize}
+    \end{itemize}
+    \item 使用集函数
+    \begin{itemize}
+        \item COUNT/ SUM / AVG / MAX/ MIN
+        \begin{itemize}
+            \item 查询选修了课程的学生人数
+            \item 计算2号课程的学生平均成绩
+        \end{itemize}
+    \end{itemize}
+    
+\end{itemize}
+
+\begin{block}{查询例子}
+\begin{lstlisting}[language=SQL]
+SELECT Sno,Grade FROM  SC WHERE  Cno= '3' ORDER BY Grade DESC;
+SELECT * FROM  Student ORDER BY Sdept, Sage DESC; 
+SELECT COUNT(DISTINCT Sno) FROM SC;
+SELECT AVG(Grade) FROM SC WHERE Cno= '2';
+
+
+\end{lstlisting}
+\end{block}
+\end{frame}
+
+
+
+
+\begin{frame}[fragile]{选择表中的若干元组}
+\begin{itemize}
+    \item 使用GROUP BY子句分组  
+    \begin{itemize}
+        \item 未对查询结果分组，聚集函数将作用于整个查询结果
+        \item 对查询结果分组后，聚集函数将分别作用于每个组 
+        \begin{itemize}
+        \item 求各个课程号及相应的选课人数
+        \end{itemize}
+    \end{itemize}
+    \item 使用HAVING短语筛选最终输出结果
+    \begin{itemize}
+        \item 只有满足HAVING短语指定条件的组才输出
+        \begin{itemize}
+            \item 查询选修了2门及以上课程的学生学号
+            \item 查询有2门及以上课程是85分以上的
+          学生的学号及（85分以上的）课程数 
+        \end{itemize}
+    \end{itemize}
+    
+\end{itemize}
+
+\begin{block}{查询例子}
+\begin{lstlisting}[language=SQL]
+SELECT Cno，COUNT(Sno) FROM SC GROUP BY Cno;
+SELECT Sno FROM  SC GROUP BY Sno HAVING  COUNT(*) >2； 
+SELECT Sno, COUNT(*) FROM   SC
+    WHERE Grade>=85 GROUP BY Sno HAVING COUNT(*)>=2;
+
+
+\end{lstlisting}
+\end{block}
+\end{frame}
+
+
+
+\subsection{连接查询}
+\begin{frame}[fragile]{连接查询}
+\begin{itemize}
+    \item 若一个查询同时涉及两个以上的表，称为连接查询
+    \begin{itemize}
+        \item 等值连接 / 非等值连接 / 
+        \begin{itemize}
+            \item 语法
+\begin{block}{}
+            \begin{lstlisting}[language=SQL]
+[<表名1>.]<列名1>  <比较运算符>  [<表名2>.]<列名2>
+            \end{lstlisting}
+\end{block}
+            
+            \item 比较运算符：=、>、<、>=、<=、!=
+            \item 查询每个学生及其选修课程的情况
+        \end{itemize}
+        \item 自然连接： 等值连接的一种特殊情况，把目标列中重复的属性列去掉
+    \end{itemize}
+\end{itemize}
+\begin{block}{查询例子}
+\begin{lstlisting}[language=SQL]
+SELECT  Student.*, SC.* FROM Student, SC WHERE  Student.Sno = SC.Sno;
+\end{lstlisting}
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{连接查询}
+\begin{itemize}
+    \item  若一个查询同时涉及两个以上的表，称为连接查询
+ 
+    \begin{itemize}
+        \item 一个表与其自己进行连接，称为表的自身连接
+        \begin{itemize}
+            \item 需要给表起别名以示区别
+            \item 由于所有属性名都是同名属性，因此必须使用别名前缀
+            \item 查询每一门课的间接先修课（即先修课的先修课）
+        \end{itemize}
+        \item 外连接操作以指定表为连接主体，将主体表中不满足连接条件的元组一并输出
+        \begin{itemize}
+            \item  查询每个学生及其选修课程的情况
+包括没有选修课程的学生----用外连接操作
+
+        \end{itemize}
+
+    \end{itemize}
+\end{itemize}
+\begin{block}{查询例子}
+\begin{lstlisting}[language=SQL]
+SELECT  FIRST.Cno, SECOND.Cpno FROM  Course  FIRST, Course  SECOND WHERE FIRST.Cpno = SECOND.Cno; 
+
+SELECT  Student.Sno, Sname, Ssex, Sage, Sdept, Cno, Grade FROM Student 
+LEFT JOIN SC  ON (Student.Sno=SC.Sno);
+\end{lstlisting}
+\end{block}
+\end{frame}
+
+
+\begin{frame}[fragile]{连接查询}
+\begin{itemize}
+    \item  若一个查询同时涉及两个以上的表，称为连接查询
+ 
+    \begin{itemize}
+        \item WHERE子句中含多个连接条件时，称为复合条件连接
+        \begin{itemize}
+            \item 查询选修2号课程且成绩在86分以上的所有学生的学号、姓名
+            \item 查询每个学生的姓名、选修课程名及成绩。
+        \end{itemize}
+
+    \end{itemize}
+\end{itemize}
+\begin{block}{查询例子}
+\begin{lstlisting}[language=SQL]
+SELECT Student.Sno, student.Sname FROM Student, SC
+WHERE Student.Sno = SC.Sno AND  SC.Cno= '2' AND  SC.Grade > 86;
+
+SELECT Sname，Cname，Grade FROM Student, SC, Course
+WHERE Student.Sno = SC.Sno AND SC.Cno = Course.Cno;
+
+\end{lstlisting}
+\end{block}
+\end{frame}
+
+\subsection{嵌套查询}
+\begin{frame}[fragile]{嵌套查询}
+\begin{itemize}
+    \item  一个SELECT-FROM-WHERE语句称为一个查询块
+    \item 将一个查询块嵌套在另一个查询块的WHERE子句或HAVING短语的条件中的查询称为嵌套查询
+    
+    \begin{itemize}
+        \item 子查询的限制 (不能使用ORDER BY子句)
+        \item 层层嵌套方式反映了 SQL语言的结构化
+        \item 有些嵌套查询可以用连接运算替代
+        \begin{itemize}
+            \item 查询选修2号课程的学生信息。
+        \end{itemize}
+
+    \end{itemize}
+\end{itemize}
+\begin{block}{查询例子}
+\begin{lstlisting}[language=SQL]
+SELECT Sname FROM Student WHERE Sno IN // 父查询
+(SELECT Sno FROM SC WHERE Cno= '2'); //子查询
+\end{lstlisting}
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{嵌套查询}
+\begin{itemize}
+    \item  带有IN谓词的子查询
+    \begin{itemize}
+        \item 例子
+        \begin{itemize}
+            \item 查询与“刘晨”在同一个系学习的学生
+            \item 查询选修了课程名为“信息系统”的学生学号和姓名
+            \item 找出每个学生超过他自己选修课程平均成绩的课程号
+        \end{itemize}
+
+    \end{itemize}
+\end{itemize}
+\begin{block}{查询例子}
+\begin{lstlisting}[language=SQL]
+SELECT Sno, Sname, Sdept FROM Student WHERE Sdept  IN
+(SELECT Sdept FROM Student WHERE Sname= '刘晨');
+
+SELECT Sno, Sname FROM Student WHERE Sno IN
+(SELECT Sno FROM SC WHERE  Cno IN 
+    (SELECT Cno FROM Course WHERE Cname= '信息系统'));
+
+\end{lstlisting}
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{嵌套查询}
+\begin{itemize}
+    \item 带有比较运算符的子查询
+    \item 带有ANY或ALL谓词的子查询
+    \item 带有EXISTS谓词的子查询
+    \begin{itemize}
+        \item 例子
+        \begin{itemize}
+            \item 找出每个学生超过他自己选修课程平均成绩的课程号
+            \item 查询其他系中比信息系某一个(其中某一个)学生年龄小的学生姓名和年龄
+            \item 查询所有选修了2号课程的学生姓名
+        \end{itemize}
+
+    \end{itemize}
+\end{itemize}
+\begin{block}{查询例子}
+\begin{lstlisting}[language=SQL]
+SELECT Sno, Cno From SC x WHERE Grade >= (select avg(Grade) from SC y where y.Sno=x.Sno);
+SELECT Sname, Sage FROM Student WHERE Sage<ANY (SELECT  Sage FROM  Student  WHERE Sdept='IS') AND Sdept != 'IS' ;  
+SELECT Sname FROM Student WHERE EXISTS 
+(SELECT * FROM SC WHERE Sno=Student.Sno AND Cno= '2')；
+
+\end{lstlisting}
+\end{block}
+\end{frame}
+
+
+\subsection{集合查询}
+\begin{frame}[fragile]{集合查询}
+\begin{itemize}
+    \item 集合查询的操作
+    \begin{itemize}
+        \item 并操作(UNION)
+        \item 交操作(INTERSECT)
+        \item 差操作(EXCEPT)
+        \begin{itemize}
+            \item 查询计算机科学系的学生及年龄不大于19岁的学生
+            \item 查询选修课程1的学生集合与选修课程2的学生集合的交集
+            \item 查询学生姓名与教师姓名的差集
+        \end{itemize}
+
+    \end{itemize}
+\end{itemize}
+\begin{block}{查询例子}
+\begin{lstlisting}[language=SQL]
+SELECT * FROM Student  WHERE Sdept= 'CS' UNION
+SELECT * FROM Student WHERE Sage<=19;
+
+SELECT Sno FROM SC WHERE Cno='1' AND 
+Sno IN (SELECT Sno FROM SC WHERE Cno='2');
+
+SELECT DISTINCT Sname FROM Student
+WHERE Sname NOT IN (SELECT Tname FROM Teacher);
+
+\end{lstlisting}
+\end{block}
+\end{frame}
+

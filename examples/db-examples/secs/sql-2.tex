@@ -1,0 +1,217 @@
+\subsection{定义基本表}
+\begin{frame}[fragile]{定义基本表}
+\begin{itemize}
+    \item 基本表的定义 (CREATE)
+    \item 数据类型
+    \begin{itemize}
+        \item 在SQL中域的概念用数据类型实现
+        \item 属性数据类型的确定：如年龄、学号
+        \item 数据类型：
+            \begin{itemize}
+                \item 字符串：CHAR, VARCHAR， TEXT
+                \item 数值: INT, FLOAT, DOUBLE
+                \item 其他：DATE, BOOLEAN, BLOB
+            \end{itemize}
+    \end{itemize}
+\end{itemize}
+\begin{block}{创建表语法}
+\begin{lstlisting}[language=SQL]
+CREATE TABLE <表名> ( 
+    <列名> <数据类型> [列完整性约束] 
+    [, <列名> <数据类型> [列完整性约束]]
+    ...\\
+    [, <表完整性约束]);
+\end{lstlisting}
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{定义基本表}
+\begin{itemize}
+    \item 基本表的定义 (CREATE)
+    \item 完整性约束
+    \begin{itemize}
+        \item 主码约束: PRIMARY KEY
+        \item 唯一性约束: UNIQUE
+        \item 非空值约束： NOT NULL
+        \item 参照完整性约束: REFERENCES
+    \end{itemize}
+\end{itemize}
+\begin{block}{创建表语法}
+\begin{lstlisting}[language=SQL]
+CREATE TABLE <表名> ( 
+    <列名> <数据类型> [列完整性约束] 
+    [, <列名> <数据类型> [列完整性约束]]
+    ...\\
+    [, <表完整性约束]);
+\end{lstlisting}
+\end{block}
+\end{frame}
+
+
+
+\begin{frame}[fragile]{建立学生表}
+\begin{itemize}
+    \item 建立一个“学生”表Student，它由学号Sno、姓名Sname、性别Ssex、年龄Sage、所在系Sdept五个属性组成。其中学号是主键，并且姓名取值也唯一
+\end{itemize}
+
+\begin{block}{建立学生表}
+\begin{lstlisting}[language=SQL]
+CREATE TABLE Student(
+   Sno CHAR(10) PRIMARY KEY,
+   Sname CHAR(5) UNIQUE,
+   Ssex CHAR(2),
+   Sage INT,
+   Sdept CHAR(20)
+);
+\end{lstlisting}
+\end{block}  
+\end{frame}
+
+
+\begin{frame}[fragile]{建立课程表}
+\begin{itemize}
+    \item 建立一个“课程”表Course，它由课程号Cno、课程名Cname、先修课程号Cpno、学分Ccredit组成。其中课程号是主键
+\end{itemize}
+
+\begin{block}{建立课程表}
+\begin{lstlisting}[language=SQL]
+CREATE TABLE Course(
+    Cno CHAR(4) PRIMARY KEY,
+    Cname CHAR(40),
+    Cpno CHAR(4),
+    Ccredit INT,
+    FOREIGN KEY (Cpno) REFERENCES Course(Cno)
+);
+\end{lstlisting}
+\end{block}
+    
+\end{frame}
+
+
+\begin{frame}[fragile]{建立选课表}
+\begin{itemize}
+    \item 建立一个“学生选课”表SC，它由学号Sno、课程号Cno，修课成绩Grade组成，其中(Sno, Cno)为主码。
+\end{itemize}
+
+\begin{block}{建立选课表}
+\begin{lstlisting}[language=SQL]
+CREATE TABLE SC(
+   Sno CHAR(10),
+   Cno CHAR(4),
+   Grade INT,
+   PRIMARY KEY (Sno, Cno),
+   FOREIGN KEY (Sno) REFERENCES Student(Sno),
+   FOREIGN KEY (Cno) REFERENCES Course(Cno),
+);
+\end{lstlisting}
+\end{block}
+    
+\end{frame}
+
+
+\subsection{修改基本表}
+
+\begin{frame}[fragile]{修改基本表}
+\begin{itemize}
+    \item 修改基本表 ALTER
+    \item 表名：要修改的基本表
+    \begin{itemize}
+        \item ADD子句：增加新列和新的完整性约束条件
+        \item DROP子句：删除指定的完整性约束条件
+        \item ALTER COLUMN子句：用于修改列名和数据类型
+        \item DROP COLUMN子句：用于删除列
+    \end{itemize}
+\end{itemize}
+\begin{block}{修改表语法}
+\begin{lstlisting}[language=SQL]
+ALTER TABLE <表名>
+    [ ADD <新列名> <数据类型> [ 完整性约束 ] ]
+    [ DROP <完整性约束名> ]
+    [ALTER COLUMN <列名> <数据类型> ]
+    [DROP COLUMN <列名> <数据类型> ];
+\end{lstlisting}
+\end{block}
+\end{frame}
+
+
+\begin{frame}[fragile]{修改基本表例子}
+\begin{itemize}
+    \item 向Student表增加“入学时间”列，其数据类型为日期型
+    \item 将入学日期的数据类型改为字符型
+    \item 将入学日期列删除掉
+    \item 删除选课表
+\end{itemize}
+\begin{block}{修改表语法}
+\begin{lstlisting}[language=SQL]
+ALTER TABLE Student ADD Scome DATETIME;
+ALTER TABLE Student ALTER COLUMN Scome char(8);
+ALTER TABLE Student DROP COLUMN Scome;
+DROP TABLE SC;
+\end{lstlisting}
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{建立和删除索引}
+\begin{itemize}
+    \item 建立索引是加快查询速度的有效手段
+    \item 建立索引
+    \begin{itemize}
+        \item DBA或表的属主（即建立表的人）根据需要建立
+        \item 有些DBMS自动建立以下列上的索引 ( PRIMARY  KEY, UNIQUE)
+    \end{itemize}
+    \item 维护索引: DBMS自动完成
+    \item 使用索引: DBMS自动选择是否使用索引以及使用哪些索引
+\end{itemize}
+\begin{block}{修改表语法}
+\begin{lstlisting}[language=SQL]
+CREATE [UNIQUE] [CLUSTER] INDEX <索引名>     ON <表名>(<列名>[<次序>][,<列名>[<次序>] ]…);
+DROP INDEX <索引名>;
+\end{lstlisting}
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{建立和删除索引例子}
+\begin{itemize}
+    \item 为学生-课程数据库中的Student，Course，SC三个表建立索引。其中Student表按学号升序建唯一索引，Course表按课程号升序建唯一索引，SC表按学号升序和课程号降序建唯一索引
+    \item 删除Student表的SCno索引
+\end{itemize}
+\begin{block}{修改表语法}
+\begin{lstlisting}[language=SQL]
+CREATE UNIQUE INDEX  Stusno ON Student(Sno);
+CREATE UNIQUE INDEX Coucno ON Course(Cno);
+CREATE UNIQUE INDEX SCno ON SC(Sno ASC, Cno DESC); 
+DROP INDEX SCno;
+\end{lstlisting}
+\end{block}
+\end{frame}
+
+
+
+\subsection{插入数据}
+\begin{frame}[fragile]{插入数据}
+\begin{itemize}
+    \item 使用 INSERT INTO 语句插入数据
+\end{itemize}
+
+\begin{block}{插入数据}
+\begin{lstlisting}[language=SQL]
+INSERT INTO Student VALUES ('20231521', '李勇', '男', 20, 'CS');
+INSERT INTO Student VALUES ('20231522', '刘晨', '女', 19, 'CS');
+INSERT INTO Student VALUES ('20231523', '王敏', '女', 18, 'MA');
+INSERT INTO Student VALUES ('20231525', '张立', '男', 19, 'AI');
+INSERT INTO Course VALUES ('1', '数据库', '5', 4);
+INSERT INTO Course VALUES ('2', '数学', NULL , 2);
+INSERT INTO Course VALUES ('3', '信息系统', 1 , 4);
+INSERT INTO Course VALUES ("4", '操作系统', 6, 3);
+INSERT INTO Course VALUES ("5", '数据结构', 7, 4);
+INSERT INTO Course VALUES ("6", '数据处理', NULL, 2);
+INSERT INTO Course VALUES ("7", 'Python语言', NULL, 4);
+INSERT INTO SC VALUES ("20231521", '1', 92);
+INSERT INTO SC VALUES ("20231521", '2', 85);
+INSERT INTO SC VALUES ("20231521", '3', 88);
+INSERT INTO SC VALUES ("20231522", '2', 90);
+INSERT INTO SC VALUES ("20231522", '3', 80);
+\end{lstlisting}
+\end{block}
+\end{frame}
+

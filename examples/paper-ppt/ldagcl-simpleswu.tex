@@ -1,0 +1,377 @@
+\documentclass[aspectratio=169, 10pt]{beamer}
+
+
+\usetheme{simpleswu}
+
+% Metadata
+\title[LDA-GCL]{Adversarial Learning Data Augmentation for \\ Graph Contrastive Learning in Recommendation}
+\author[Huang et al.]{Junjie Huang, Qi Cao, Ruobing Xie, Shaoliang Zhang, \\ Feng Xia, Huawei Shen, Xueqi Cheng}
+\institute[]{Institute of Computing Technology, Chinese Academy of Sciences \\ Tencent WeChat}
+\date{}
+
+% Custom commands for consistency
+\newcommand{\method}{LDA-GCL}
+\newcommand{\eg}{e.g., }
+\newcommand{\ie}{i.e., }
+
+\begin{document}
+
+% Slide 1: Title
+\titlepage
+
+% Slide 2: Table of Contents
+\begin{frame}{Table of Contents}
+    \tableofcontents
+\end{frame}
+
+%Section 1
+\section{Introduction}
+
+\begin{frame}{Introduction: Recommender Systems \& GNNs}
+    \textbf{Context}
+    \begin{itemize}
+        \item Collaborative Filtering (CF) models user-item interactions.
+        \item Modeled as Bipartite Graph $G = (\mathcal{U}, \mathcal{I}, \mathcal{E})$.
+        \item Graph Neural Networks (GNNs) capture high-order structure.
+        \item Examples: NGCF, LightGCN.
+    \end{itemize}
+    \vspace{0.5cm}
+    \pause
+    \textbf{The Problem}
+    \begin{itemize}
+        \item \textbf{Data Sparsity}: Limited interactions for learning quality embeddings.
+        \item Performance degrades significantly on sparse datasets.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Solution: Graph Contrastive Learning (GCL)}
+    \textbf{Current Approach: GCL}
+    \begin{itemize}
+        \item Self-supervised learning paradigm.
+        \item \textbf{Data Augmentation}: Create multiple views of the graph (\eg edge dropping).
+        \item \textbf{Contrastive Loss}: Maximize agreement between views (InfoNCE).
+    \end{itemize}
+    \vspace{0.5cm}
+    \pause
+    \textbf{Limitations of Existing GCL}
+    \begin{itemize}
+        \item Relies on \textbf{heuristic} augmentation (random sampling).
+        \item Random dropping may destroy structural information.
+        \item Improper augmentation hinders performance.
+        \item \textbf{Goal}: Learn an \textit{optimal} augmentation strategy automatically.
+    \end{itemize}
+\end{frame}
+
+% Section 2
+\section{Background}
+
+\begin{frame}{Background: Principles of Contrastive Learning}
+    \textbf{InfoMax Principle} (Standard GCL)
+    \begin{itemize}
+        \item Objective: Maximize Mutual Information (MI) between views.
+        \item Learn representations invariant to perturbations.
+        \item Used by most current methods (\eg SGL, SimGCL).
+    \end{itemize}
+    \vspace{0.5cm}
+    \pause
+    \textbf{InfoMin Principle} (Our Inspiration)
+    \begin{itemize}
+        \item Concept: A good set of views shares the \textbf{minimal} information necessary.
+        \item Removing redundancy forces the model to learn robust features.
+        \item Stronger, harder augmentations lead to better downstream performance.
+    \end{itemize}
+\end{frame}
+
+% Section 3
+\section{Methodology: LDA-GCL}
+
+\begin{frame}{Overview of \method}
+    \textbf{Proposed Framework: \method}
+    \begin{itemize}
+        \item \textbf{L}earnable \textbf{D}ata \textbf{A}ugmentation for \textbf{G}raph \textbf{C}ontrastive \textbf{L}earning.
+        \item Combines InfoMax and InfoMin principles via adversarial training.
+    \end{itemize}
+    \pause
+    \vspace{0.5cm}
+    \textbf{Core Components}
+    \begin{enumerate}
+        \item \textbf{Edge Operating}: New augmentation strategy (Adding + Dropping).
+        \item \textbf{Learnable View Generator ($t$)}: Learns to create "hard" views.
+        \item \textbf{GNN Encoder ($f$)}: Learns robust embeddings.
+        \item \textbf{Adversarial Optimization}: Min-Max game.
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}{Framework Architecture}
+    % Placeholder for Figure 1
+    \begin{figure}
+        \centering
+        % \fbox{\begin{minipage}{0.8\textwidth}
+        %     \centering
+        %     \vspace{2cm}
+        %     \textbf{[Placeholder for Framework Diagram]} \\
+        %     \small (See Fig. 1 in original paper: Pre-trained Candidate Generation $\rightarrow$ Edge Operator $\rightarrow$ Contrastive Learning)
+        %     \vspace{2cm}
+        % \end{minipage}}
+        \includegraphics[width=\textwidth]{./imgs/framework.pdf}
+        \caption{\method~ Framework: Learning Data Augmentation + GCL.}
+    \end{figure}
+\end{frame}
+
+\begin{frame}{1. Edge Operating Augmentation}
+    \textbf{Challenge with Random Augmentation}
+    \begin{itemize}
+        \item Randomly adding edges introduces noise.
+        \item Sampling from all non-observed edges is $O(|\mathcal{V}|^2)$ (too expensive).
+    \end{itemize}
+    \pause
+    \vspace{0.5cm}
+    \textbf{Proposed Solution: Pre-trained Candidates}
+    \begin{itemize}
+        \item Train a light GNN (e.g., LightGCN) first.
+        \item Identify top-$K_u$ likely items for user $u$.
+        \item \textbf{Edge Candidates} ($\mathcal{E}_{cand}$): Original Edges $\cup$ Suggested Edges.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{2. Learnable Edge Operator}
+    \textbf{Generating the View}
+    \begin{itemize}
+        \item Instead of random sampling, learn a probability $p_{u,i}$ for each candidate edge.
+        \item Use an MLP edge operator model $t$:
+    \end{itemize}
+    \begin{equation*}
+        \omega_{u,i} = \operatorname{MLP}([z_u \odot z_i] \parallel \mathds{1}_{\mathcal{E}}(e_{u,i}))
+    \end{equation*}
+    \begin{itemize}
+        \item $z_u, z_i$: Embeddings.
+        \item $\mathds{1}_{\mathcal{E}}$: Indicator (is original edge or added?).
+    \end{itemize}
+    \pause
+    \vspace{0.3cm}
+    \textbf{Differentiable Sampling (Gumbel-Max)}
+    \begin{itemize}
+        \item To allow backpropagation through sampling:
+    \end{itemize}
+    \begin{equation*}
+        p_{u,i} = \mathrm{sigmoid}\left(\frac{\log\delta - \log(1-\delta) + \omega_{u,i}}{\tau}\right)
+    \end{equation*}
+    \begin{itemize}
+        \item Generates augmented adjacency matrix $\mathbf{A}'$.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{3. Adversarial Objective (The Min-Max Game)}
+    \textbf{Objective Function}
+    \begin{itemize}
+        \item Optimization involves the Augmenter $t$ and Encoder $f$:
+    \end{itemize}
+    \begin{align*}
+        \min_{t} \quad & \lambda_t I(f(G); f(t(G))) + \mathcal{L}(f(t(G)), y) \\
+        \max_{f} \quad & I(f(G); f(t(G))) - \mathcal{L}(f(G), y)
+    \end{align*}
+    \pause
+    \begin{itemize}
+        \item \textbf{Minimizing $I$ (for $t$)}: InfoMin. Create views that share \textit{minimal} info (hard samples).
+        \item \textbf{Maximizing $I$ (for $f$)}: InfoMax. Encoder tries to align views despite augmentation.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Loss Functions: Concrete Form}
+    \textbf{Fix Augmenter $t$, Optimize Encoder $f$}
+    \begin{itemize}
+        \item Standard GCL training step.
+        \item Maximize agreement (InfoNCE) + Minimize BPR loss.
+    \end{itemize}
+    \begin{equation*}
+        \mathcal{L}_f = \mathcal{L}_{\text{BPR}}(f(G)) + \lambda_{ssl}\mathcal{L}_{\text{NCE}}(f(G), f(t(G)))
+    \end{equation*}
+    \pause
+    \textbf{Fix Encoder $f$, Optimize Augmenter $t$}
+    \begin{itemize}
+        \item Adversarial step.
+        \item \textit{Minimize} agreement (make the view different).
+        \item Maintain task performance (don't break the graph).
+    \end{itemize}
+    \begin{equation*}
+        \mathcal{L}_t = \mathcal{L}_{\text{BPR}}(f(t(G))) - \lambda_2 \mathcal{L}_{\text{NCE}}(f(G), f(t(G)))
+    \end{equation*}
+\end{frame}
+
+\begin{frame}{Training Algorithm}
+    \begin{algorithm}[H]
+    \SetAlgoLined
+    \KwIn{Graph $G$, Pre-trained $f_0$}
+    Generate candidate edges using $f_0$\;
+    Initialize $t$ and $f$\;
+    \For{epoch = 1 \KwTo T}{
+        \For{each mini-batch}{
+            \tcc{Optimize Augmenter (InfoMin)}
+            Freeze $f$, Unfreeze $t$\;
+            Generate view $t(G)$\;
+            Update $t$ via $\mathcal{L}_t$ (Minimize MI)\;
+            
+            \vspace{0.1cm}
+            \tcc{Optimize Encoder (InfoMax)}
+            Freeze $t$, Unfreeze $f$\;
+            Generate view $t(G)$\;
+            Update $f$ via $\mathcal{L}_f$ (Maximize MI)\;
+        }
+    }
+    \caption{\method~ Adversarial Training}
+    \end{algorithm}
+\end{frame}
+
+% Section 4
+\section{Experiments}
+
+\begin{frame}{Experimental Setup}
+    \textbf{Datasets}
+    \begin{itemize}
+        \item Yelp, Gowalla, Amazon-Book, Alibaba-iFashion.
+        \item Variety in size and density (Alibaba is very sparse).
+    \end{itemize}
+    \vspace{0.3cm}
+    \textbf{Baselines}
+    \begin{itemize}
+        \item \textbf{MF}: BPRMF, NeuMF.
+        \item \textbf{GNN}: NGCF, DGCF, LightGCN.
+        \item \textbf{GCL}: SGL (Edge Drop), SimGCL (Noise), NCL (Neighbor Contrast).
+    \end{itemize}
+    \vspace{0.3cm}
+    \textbf{Metrics}
+    \begin{itemize}
+        \item Recall@10, 20, 50.
+        \item NDCG@10, 20, 50.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Performance Comparison (Main Results)}
+    \begin{itemize}
+        \item \method~ consistently outperforms baselines.
+        \item Significant improvement over SGL and NCL.
+    \end{itemize}
+    \begin{table}
+    \centering
+    \resizebox{0.9\textwidth}{!}{
+    \begin{tabular}{c|ccc|c}
+        \toprule
+        Dataset & LightGCN & SGL & NCL & \textbf{\method} \\
+        \midrule
+        \textbf{Yelp} (Recall@20) & 0.1001 & 0.1072 & 0.1135 & \textbf{0.1190} \\
+        \textbf{Amazon} (Recall@20) & 0.1210 & 0.1281 & 0.1395 & \textbf{0.1456} \\
+        \textbf{Gowalla} (Recall@20) & 0.1969 & 0.1969 & 0.2131 & \textbf{0.2144} \\
+        \textbf{Alibaba} (Recall@20) & 0.0612 & 0.0774 & 0.0729 & \textbf{0.0882} \\
+        \bottomrule
+    \end{tabular}
+    }
+    \caption{Subset of experimental results (Recall@20).}
+    \end{table}
+    \pause
+    \begin{itemize}
+        \item Highest gains on \textbf{Alibaba-iFashion} (sparsest dataset).
+        \item Demonstrates effectiveness in handling data sparsity.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Analysis: Why it works? (Sparsity)}
+    \textbf{Performance by User Group (Interaction Frequency)}
+    \begin{figure}
+        \centering
+        \fbox{\begin{minipage}{0.45\textwidth}
+            \centering
+            \vspace{1.5cm} \textbf{[Fig: Gowalla Groups]} \vspace{1.5cm}
+        \end{minipage}}
+        \fbox{\begin{minipage}{0.45\textwidth}
+            \centering
+            \vspace{1.5cm} \textbf{[Fig: Alibaba Groups]} \vspace{1.5cm}
+        \end{minipage}}
+        \caption{\method~ vs SGL vs LightGCN on user groups.}
+    \end{figure}
+    \begin{itemize}
+        \item \method~ outperforms LightGCN and SGL across all groups.
+        \item Gains are largest for sparse users (low interaction count).
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Ablation Study}
+    \textbf{Components Analysis}
+    \begin{itemize}
+        \item \textbf{w/o EA}: Removing Edge Adding (only learnable dropping).
+            \begin{itemize}
+                \item Performance drops $\rightarrow$ Adding edges helps explore structure.
+            \end{itemize}
+        \item \textbf{w NGCF}: Using NGCF for edge candidates instead of LightGCN.
+            \begin{itemize}
+                \item Performance drops $\rightarrow$ Quality of candidates matters.
+            \end{itemize}
+        \item \textbf{DA-GCL}: Random adding/dropping (No learning).
+            \begin{itemize}
+                \item \method~ is superior $\rightarrow$ \textbf{Learnable} augmentation is key.
+            \end{itemize}
+    \end{itemize}
+    \pause
+    \vspace{0.5cm}
+    \textbf{Conclusion from Ablation}
+    \begin{itemize}
+        \item Both Edge Operating (Adding) and Learnable Selection (Adversarial) are crucial.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Parameter Analysis}
+    \textbf{Impact of Adversarial Weight $\lambda_t$}
+    \begin{itemize}
+        \item $\lambda_t$ controls the strength of minimizing Mutual Information.
+        \item $\lambda_t = 0$: No adversarial training.
+    \end{itemize}
+    \begin{figure}
+        \centering
+        \fbox{\begin{minipage}{0.45\textwidth}
+            \centering
+            \vspace{1cm} \textbf{[Fig: Parameter Sensitivity]} \vspace{1cm}
+        \end{minipage}}
+    \end{figure}
+    \begin{itemize}
+        \item Results show $\lambda_t > 0$ yields better performance.
+        \item Confirms the \textbf{InfoMin} principle improves robustness.
+    \end{itemize}
+\end{frame}
+
+% Section 5
+\section{Conclusion}
+
+\begin{frame}{Conclusion}
+    \textbf{Summary}
+    \begin{itemize}
+        \item Proposed \textbf{\method}: A theoretical framework for GCL in Recommendation.
+        \item Integrated \textbf{InfoMin} (Adversarial View Gen.) and \textbf{InfoMax} (Contrastive).
+        \item Designed \textbf{Edge Operating} augmentation (Adding + Dropping).
+    \end{itemize}
+    \vspace{0.5cm}
+    \pause
+    \textbf{Key Takeaways}
+    \begin{itemize}
+        \item Replaces heuristic augmentation with learned strategies.
+        \item Effectively handles data sparsity.
+        \item Achieves state-of-the-art performance on benchmarks.
+    \end{itemize}
+    \vspace{0.5cm}
+    \textbf{Future Work}
+    \begin{itemize}
+        \item Improve training efficiency (reduce complexity of learning $t$).
+    \end{itemize}
+\end{frame}
+
+% \begin{frame}
+%     \centering
+%     \Huge \textbf{Thank You!}
+    
+%     \vspace{1cm}
+%     \Large Q \& A
+% \end{frame}
+
+\qapage
+
+\refpage
+
+\end{document}

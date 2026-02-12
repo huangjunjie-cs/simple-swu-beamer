@@ -1,0 +1,80 @@
+% IMPORTANT: PLEASE USE XeLaTeX FOR TYPESETTING
+\documentclass[t]{beamer}
+\usetheme{simpleswu}
+
+% meta-data
+\title{数据库系统概论}
+\subtitle{第8章 数据库编程}
+\author{黄俊杰}
+\date{2023 Fall}
+
+
+\usepackage{booktabs}
+\usepackage{multirow}
+
+% \addtobeamertemplate{block begin}{%
+%     \setlength{\textwidth}{0.8\textwidth}
+% }{}
+
+
+
+% document body
+\begin{document}
+
+\lstset{
+    language=SQL,
+    morekeywords={WITH,to_char,to_date,WHILE, LOOP, FOR, IF, ELSIF, DECLARE, CURSOR, OPEN, FETCH, EXIT, CALL, CLOSE, RAISE, NOTICE, PERFORM},
+    numbers=left,
+    stepnumber=1,
+    linewidth=0.8\linewidth,
+    xleftmargin=0.1\linewidth
+}
+
+\maketitle
+
+
+\section{概述}
+\input{secs/db-1}
+
+\section{过程化SQL}
+\input{secs/db-2}
+
+\section{JDBC编程}
+\input{secs/db-3}
+
+\section{基于MVC框架的数据库应用开发}
+\input{secs/db-4}
+
+
+\section{本章小结}
+\begin{frame}{本章小结}
+\begin{itemize}
+    \item 扩展SQL语言的功能
+    \begin{itemize}
+        \item 引入新的SQL子句、引入新的内置函数、引入PL/SQL以及存储过程和存储函数等技术
+        \item SQL与高级语言具有不同的数据处理方式。SQL是面向集合的，而高级语言是面向记录的。游标就是用来协调这两种不同的处理方式的机制
+    \end{itemize}
+
+
+    \item 通过高级语言实现复杂应用
+    \begin{itemize}
+        \item JDBC的工作原理和工作流程
+        \item 基于MVC框架的开发方式
+    \end{itemize}
+
+
+\end{itemize}
+    
+\end{frame}
+
+\backmatter
+
+\begin{frame}[t]
+\frametitle{Reference}
+\framesubtitle{参考资料}
+\nocite{*}
+\bibliographystyle{abbrvnat} % We choose the "plain" reference style
+\bibliography{refs}
+\end{frame}
+
+\end{document}

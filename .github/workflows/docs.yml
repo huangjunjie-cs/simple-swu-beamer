@@ -1,0 +1,89 @@
+name: Docs
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+
+      - name: Install dependencies
+        run: |
+          uv sync --only-group docs
+
+      - name: Install poppler-utils
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y poppler-utils
+
+      - name: Build example (db-examples)
+        uses: xu-cheng/latex-action@v2
+        with:
+          working_directory: examples/db-examples
+          latexmk_use_xelatex: true
+          root_file: |
+            db-chapter8.tex
+
+      - name: Build example (paper-ppt)
+        uses: xu-cheng/latex-action@v2
+        with:
+          working_directory: examples/paper-ppt
+          latexmk_use_xelatex: true
+          root_file: |
+            ldagcl-gemini-default.tex
+            ldagcl-simpleswu.tex
+            ldagcl-simpleswu-43.tex
+
+      - name: Collect example PDFs
+        run: |
+          mkdir -p docs/_static/pdfs
+          cp examples/db-examples/db-chapter8.pdf docs/_static/pdfs/db-chapter8.pdf
+          cp examples/paper-ppt/ldagcl-gemini-default.pdf docs/_static/pdfs/ldagcl-gemini-default.pdf
+          cp examples/paper-ppt/ldagcl-simpleswu.pdf docs/_static/pdfs/ldagcl-simpleswu.pdf
+          cp examples/paper-ppt/ldagcl-simpleswu-43.pdf docs/_static/pdfs/ldagcl-simpleswu-43.pdf
+
+      - name: Build docs
+        run: uv run sphinx-build -b html docs docs/_build/html
+
+      - name: Generate PDF preview images
+        run: uv run python docs/pdf2imgs.py
+
+      - name: Upload pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/_build/html
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

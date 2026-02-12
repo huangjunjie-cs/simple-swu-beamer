@@ -1,0 +1,385 @@
+\NeedsTeXFormat{LaTeX2e}
+\mode<presentation>
+
+% =========================================================
+% Core packages (graphics, math, tables)
+% =========================================================
+\RequirePackage{tikz}
+\RequirePackage[utf8]{inputenc}      % NOTE: XeLaTeX 下通常不需要，但保留以兼容
+\RequirePackage[T1]{fontenc}         % NOTE: XeLaTeX 下 latin 字体多用 fontspec
+\RequirePackage{graphicx}
+\RequirePackage{grffile}
+\RequirePackage{longtable}
+\RequirePackage{wrapfig}
+\RequirePackage{rotating}
+\RequirePackage[normalem]{ulem}
+\RequirePackage{amsmath}
+\RequirePackage{amsfonts}
+\RequirePackage{amssymb}
+\RequirePackage{textcomp}
+\RequirePackage{xcolor}
+\RequirePackage{lmodern}
+\RequirePackage{tcolorbox}
+\RequirePackage{multicol}
+\RequirePackage[round]{natbib}
+\RequirePackage[font=scriptsize,labelfont=bf]{caption}
+
+% Hyperref setup (two-stage: early “hidelinks”, later “colorlinks”)
+\hypersetup{
+  hidelinks,
+  citecolor=black
+}
+
+% =========================================================
+% Theme options / flags
+% =========================================================
+\newif\ifbeamer@secheader
+\beamer@secheaderfalse
+
+\DeclareOptionBeamer{secheader}{\beamer@secheadertrue}
+\ProcessOptionsBeamer
+
+% =========================================================
+% Color palette (institution colors)
+% =========================================================
+\definecolor{SWUBlue}{rgb}{0.0, 0.239, 0.514}
+\definecolor{ICTBlue}{rgb}{0.0, 0.239, 0.514}
+\definecolor{PKURed}{rgb}{0.545, 0, 0.071}
+
+% =========================================================
+% Beamer theme composition
+%   - default theme: minimal structural templates
+%   - whale colortheme: blue-ish palettes
+%   - circles innertheme: bullet styles, block aesthetics
+%   - shadow outertheme: adds shadow-like separation for header/footer
+% =========================================================
+\usetheme{default}
+\usecolortheme{whale}
+\usefonttheme[onlymath]{serif}
+\useinnertheme{circles}
+
+% Outer theme shadow often introduces a headline navigation bar.
+% We keep shadow's styling but remove the headline content entirely.
+
+% 不要顶部导航
+\setbeamertemplate{headline}{}
+
+% --- Frametitile: SWUBlue bar + soft vertical shadow (like your Fig.2) ---
+\setbeamercolor{frametitle}{bg=SWUBlue, fg=white}
+
+\newlength{\swu@ftleft}
+\setlength{\swu@ftleft}{1.0em} % 标题左边距，可调
+
+\newlength{\swu@shadowh}
+\setlength{\swu@shadowh}{1.0ex} % 阴影高度，可调（图2大概 1.2ex~2.0ex）
+
+
+\makeatletter
+\setbeamertemplate{frametitle}{%
+  \nointerlineskip%
+  % 1) 标题栏本体
+  \begin{beamercolorbox}[
+    wd=\paperwidth,
+    ht=2.5ex,
+    dp=1ex,
+    sep=0pt,
+    leftskip=\swu@ftleft,
+    rightskip=0.8em
+  ]{frametitle}%
+    \usebeamerfont{frametitle}\insertframetitle%
+  \end{beamercolorbox}%
+  % 2) 真实阴影：竖向渐变（上深下浅），紧贴在标题栏下方
+\par\nointerlineskip%
+\begin{beamercolorbox}[wd=\paperwidth,ht=\swu@shadowh,dp=0ex,sep=0pt,leftskip=0pt,rightskip=0pt]{}
+  \begin{tikzpicture}[x=1pt,y=1pt]
+    \path[
+      shade,
+      shading angle=90,
+      top color=black!35,
+      bottom color=black!0
+    ] (0,0) rectangle (\paperwidth,\swu@shadowh);
+  \end{tikzpicture}%
+\end{beamercolorbox}%
+\nointerlineskip%
+
+}
+\makeatother
+
+% =========================================================
+% Section transition: show outline at the beginning of each section
+% =========================================================
+\AtBeginSection[]{
+  \begin{frame}<beamer>
+    \frametitle{Outline}
+    \tableofcontents[currentsection]
+  \end{frame}
+  \subsection{}
+}
+
+
+
+
+
+% Enable colored links (this overrides earlier hidelinks intent for links)
+\hypersetup{colorlinks=true, linkcolor=blue}
+
+% =========================================================
+% Global colors / layout knobs
+% =========================================================
+\setbeamercolor{palette primary}{bg=SWUBlue, fg=white}
+
+% Background footer image on every slide
+% (overlay node anchored at bottom)
+\usebackgroundtemplate{
+  \tikz[overlay, remember picture]
+    \node[anchor=south, at=(current page.south), yshift=-8pt]{
+      \includegraphics[width=\paperwidth]{assets/swu-footer-1.pdf}
+    };
+}
+
+% Footline: simple frame number
+\setbeamertemplate{footline}[frame number]
+% 让正文区更宽（更接近 Madrid）
+\setbeamersize{text margin left=1em, text margin right=1.0em}
+
+
+% Table-of-contents style: numbered sections
+% \setbeamertemplate{section in toc}[sections numbered]
+\setbeamertemplate{section in toc}{%
+  \leavevmode%
+  \hspace*{0.5em}
+  \makebox[2.0em][l]{% 这里控制“编号区宽度”
+    \tikz[baseline=(n.base)]{
+      \node[
+        circle, fill=SWUBlue, inner sep=1.2pt,
+        text=white, font=\scriptsize\bfseries
+      ] (n) {\inserttocsectionnumber};
+    }%
+  }%
+  \inserttocsection\par%
+}
+
+
+% % List indentation (note: beamer ignores some list params depending on templates)
+% \setlength{\leftmargini}{0.0cm}
+% \setlength{\leftmarginii}{0.5cm}
+% \setlength{\leftmarginiii}{0.5cm}
+
+% Itemize/enumerate colors
+\setbeamercolor{itemize/enumerate body}{fg=black}
+\setbeamercolor{itemize/enumerate subbody}{fg=black}
+\setbeamercolor{itemize/enumerate subsubbody}{fg=black}
+
+% =========================================================
+% Itemize symbols & spacing
+% =========================================================
+\RequirePackage{fontawesome5}
+
+% Use square as main bullet template, and FontAwesome clone icon for subitems
+\setbeamertemplate{itemize item}{
+  \raisebox{0.25ex}{\scriptsize \faCircle[regular]}
+  \hspace{-0.6em}
+}
+\setbeamertemplate{itemize subitem}{
+  \raisebox{0.2ex}{\tiny \faDotCircle}
+  \hspace{-0.5em}
+}
+\setbeamertemplate{itemize subsubitem}{
+  \raisebox{0.15ex}{\tiny $\bullet$}
+  \hspace{-0.25em}
+}
+
+% \setbeamertemplate{itemize/enumerate body begin}{\large}
+
+% Remove navigation symbols (bottom-right buttons)
+\beamertemplatenavigationsymbolsempty
+
+% =========================================================
+% CJK fonts (XeLaTeX) - uses local Adobe font files
+% =========================================================
+\RequirePackage{fontspec}
+\RequirePackage{xeCJK}
+
+\defaultfontfeatures{Path = assets/fonts/zh_CN-Adobe/, Mapping=tex-text}
+
+\setCJKmainfont[
+  BoldFont=AdobeHeitiStd-Regular.otf,
+  ItalicFont=AdobeKaitiStd-Regular.otf,
+  SmallCapsFont=AdobeHeitiStd-Regular.otf
+]{AdobeSongStd-Light.otf}
+
+\setCJKsansfont{AdobeHeitiStd-Regular.otf}
+\setCJKmonofont{AdobeFangsongStd-Regular.otf}
+
+% Convenient CJK family switches
+\setCJKfamilyfont{zhsong}{AdobeSongStd-Light.otf}
+\setCJKfamilyfont{zhhei}{AdobeHeitiStd-Regular.otf}
+\setCJKfamilyfont{zhfs}{AdobeFangsongStd-Regular.otf}
+\setCJKfamilyfont{zhkai}{AdobeKaitiStd-Regular.otf}
+
+\newcommand*{\songti}{\CJKfamily{zhsong}} % 宋体
+\newcommand*{\heiti}{\CJKfamily{zhhei}}   % 黑体
+\newcommand*{\kaishu}{\CJKfamily{zhfs}}   % 楷书(这里按你的原意映射为仿宋)
+\newcommand*{\fangsong}{\CJKfamily{zhfs}} % 仿宋
+
+% =========================================================
+% Algorithms / tables / figures
+% =========================================================
+\RequirePackage{algorithm2e}
+\RequirePackage{algorithmic}
+\RequirePackage{float}
+\RequirePackage{dsfont}
+\RequirePackage{booktabs}
+\RequirePackage{multirow}
+\RequirePackage{threeparttable}
+\RequirePackage{subfig}
+
+% =========================================================
+% TikZ libraries (for diagrams)
+% =========================================================
+\usetikzlibrary{
+  arrows.meta,
+  backgrounds,
+  positioning,
+  fit,
+  petri,
+  shapes,
+  arrows,
+  snakes,
+  decorations,
+  external,
+  calc,
+  patterns,
+  decorations.pathmorphing
+}
+
+% =========================================================
+% Fine-tuned list spacing by depth (patch itemize/enumerate)
+% =========================================================
+\RequirePackage{xpatch}
+\makeatletter
+\newlength{\my@beamer@itemsepi}\setlength{\my@beamer@itemsepi}{0.6ex}
+\newlength{\my@beamer@itemsepii}\setlength{\my@beamer@itemsepii}{0.35ex}
+\newlength{\my@beamer@itemsepiii}\setlength{\my@beamer@itemsepiii}{0.2ex}
+
+\newcommand{\my@beamer@setsep}{%
+  \ifnum\@itemdepth=1\relax
+    \setlength\itemsep{\my@beamer@itemsepi}%
+  \else
+    \ifnum\@itemdepth=2\relax
+      \setlength\itemsep{\my@beamer@itemsepii}%
+    \else
+      \ifnum\@itemdepth=3\relax
+        \setlength\itemsep{\my@beamer@itemsepiii}%
+      \fi
+    \fi
+  \fi
+}
+
+\xpatchcmd{\itemize}{\def\makelabel}{\my@beamer@setsep\def\makelabel}{}{}
+\xpatchcmd{\beamer@enum@}{\def\makelabel}{\my@beamer@setsep\def\makelabel}{}{}
+
+% helper: change all three levels at once
+\newcommand\setlistsep[3]{%
+  \setlength{\my@beamer@itemsepi}{#1}%
+  \setlength{\my@beamer@itemsepii}{#2}%
+  \setlength{\my@beamer@itemsepiii}{#3}%
+}
+\makeatother
+
+% =========================================================
+% Handy reference macros
+% =========================================================
+\newcommand{\tinycite}[2][2]{{~\tiny{(\citeauthor[#1]{#2}})}}
+\newcommand{\Real}{\ensuremath{\mathbb{R}}}
+\newcommand{\secref}[1]{Section~\ref{#1}}
+\newcommand{\figref}[1]{Fig~\ref{#1}}
+\newcommand{\tableref}[1]{Table~\ref{#1}}
+\newcommand{\equref}[1]{Equation~\ref{#1}}
+\newcommand{\algref}[1]{Algorithm~\ref{#1}}
+
+% =========================================================
+% Title page: custom template (simpleswu)
+% =========================================================
+\setbeamertemplate{title page}[empty]
+
+\defbeamertemplate*{title page}{simpleswu}[1][]{
+  {
+    \usebackgroundtemplate{} % no footer background on title page
+    \begin{frame}[noframenumbering,plain]
+      \vbox{}\vfill
+      \begingroup\centering
+        \begin{beamercolorbox}[sep=8pt,center,#1]{title}
+          \usebeamerfont{title}\inserttitle\par
+          \ifx\insertsubtitle\@empty\else
+            \vskip0.25em
+            \usebeamerfont{subtitle}\usebeamercolor[fg]{subtitle}\insertsubtitle\par
+          \fi
+        \end{beamercolorbox}
+        \vskip1em
+        \begin{beamercolorbox}[sep=8pt,center,#1]{author}
+          \usebeamerfont{author}\insertauthor
+        \end{beamercolorbox}
+        \begin{beamercolorbox}[sep=8pt,center,#1]{institute}
+          \usebeamerfont{institute}\insertinstitute
+        \end{beamercolorbox}
+        \begin{beamercolorbox}[sep=8pt,center,#1]{date}
+          \usebeamerfont{date}\insertdate
+        \end{beamercolorbox}
+        \vskip0.5em
+        {\usebeamercolor[fg]{titlegraphic}\inserttitlegraphic\par}
+      \endgroup
+      \vfill
+    \end{frame}
+  }
+}
+
+
+% =========================================================
+% Blocks: make theorem/block look like "boxed + shadow"
+% =========================================================
+\setbeamertemplate{blocks}[rounded][shadow=true]
+\setbeamercolor{block title}{bg=PKURed!85!white, fg=white}
+\setbeamercolor{block body}{bg=black!5, fg=black}
+
+% 可选：example/alert 的颜色也一起统一
+\setbeamercolor{block title example}{bg=PKURed!85!black, fg=white}
+\setbeamercolor{block body example}{bg=black!4, fg=black}
+\setbeamercolor{block title alerted}{bg=PKURed!75!black, fg=white}
+\setbeamercolor{block body alerted}{bg=red!3, fg=black}
+
+
+% =========================================================
+% QA page (full blue background)
+% =========================================================
+\newcommand{\qapage}{
+  {
+    \usebackgroundtemplate{
+      \tikz[overlay,remember picture]
+        \fill[SWUBlue] (current page.south west) rectangle (current page.north east);
+    }
+    \begin{frame}[c,noframenumbering,plain]{}
+      \centering
+      \usebeamercolor[fg]{frametitle}
+      \Huge $$\mathcal Q \& \mathcal A$$
+      \Huge $$Thank\ you!$$
+      \Large \textbf{感谢您的聆听和反馈}
+    \end{frame}
+  }
+}
+
+% =========================================================
+% Reference page (appendix bibliography)
+% =========================================================
+\newcommand{\refpage}{
+  \section<presentation>*{\appendixname}
+  \subsection<presentation>*{Reference}
+  \begin{frame}[allowframebreaks,noframenumbering,plain]
+    \frametitle<presentation>{Reference}
+    \tiny
+    \bibliographystyle{abbrvnat}
+    \bibliography{refs}
+  \end{frame}
+}
+
+\mode<all>
