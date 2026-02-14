@@ -43,7 +43,7 @@ jobs:
       - name: Build example (db-examples)
         uses: xu-cheng/latex-action@v2
         env:
-          TEXINPUTS: ${{ github.workspace }}/simple_swu_beamer//:
+          TEXINPUTS: "${{ github.workspace }}/simple_swu_beamer//:"
         with:
           working_directory: examples/db-examples
           latexmk_use_xelatex: true
@@ -53,7 +53,7 @@ jobs:
       - name: Build example (paper-ppt)
         uses: xu-cheng/latex-action@v2
         env:
-          TEXINPUTS: ${{ github.workspace }}/simple_swu_beamer//:
+          TEXINPUTS: "${{ github.workspace }}/simple_swu_beamer//:"
         with:
           working_directory: examples/paper-ppt
           latexmk_use_xelatex: true
