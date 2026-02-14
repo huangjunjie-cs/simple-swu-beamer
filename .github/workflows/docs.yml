@@ -22,6 +22,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Pull Git LFS objects
+        run: git lfs pull
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -39,6 +44,16 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y poppler-utils
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Prepare LaTeX assets
+        run: |
+          mkdir -p examples/db-examples/assets/fonts/zh_CN-Adobe
+          mkdir -p examples/paper-ppt/assets/fonts/zh_CN-Adobe
+          cp -a simple_swu_beamer/assets/fonts/zh_CN-Adobe/. examples/db-examples/assets/fonts/zh_CN-Adobe/
+          cp -a simple_swu_beamer/assets/fonts/zh_CN-Adobe/. examples/paper-ppt/assets/fonts/zh_CN-Adobe/
 
       - name: Build example (db-examples)
         uses: xu-cheng/latex-action@v2
@@ -69,6 +84,24 @@ jobs:
           cp examples/paper-ppt/ldagcl-gemini-default.pdf docs/_static/pdfs/ldagcl-gemini-default.pdf
           cp examples/paper-ppt/ldagcl-simpleswu.pdf docs/_static/pdfs/ldagcl-simpleswu.pdf
           cp examples/paper-ppt/ldagcl-simpleswu-43.pdf docs/_static/pdfs/ldagcl-simpleswu-43.pdf
+
+      - name: Build downloadable examples bundle
+        run: |
+          mkdir -p docs/_static/downloads
+          bundle_root="$(mktemp -d)/examples"
+          mkdir -p "$bundle_root/assets"
+          cp examples/_template/main.tex "$bundle_root/main.tex"
+          cp examples/_template/README.md "$bundle_root/README.md"
+          cp simple_swu_beamer/beamerthemesimpleswu.sty "$bundle_root/beamerthemesimpleswu.sty"
+          cp -a simple_swu_beamer/assets/fonts "$bundle_root/assets/"
+          cp simple_swu_beamer/assets/swu-footer-1.pdf "$bundle_root/assets/"
+          cp simple_swu_beamer/assets/swu-footer-2.pdf "$bundle_root/assets/"
+          cp simple_swu_beamer/assets/swu-footer.pdf "$bundle_root/assets/"
+          find "$bundle_root" -name '.DS_Store' -delete
+          (
+            cd "$(dirname "$bundle_root")"
+            zip -rq "$GITHUB_WORKSPACE/docs/_static/downloads/examples.zip" "examples"
+          )
 
       - name: Build docs
         run: uv run sphinx-build -b html docs docs/_build/html

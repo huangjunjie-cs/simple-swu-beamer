@@ -5,6 +5,17 @@
 - `examples/db-examples`：数据库课程风格（中文课程内容）。
 - `examples/论文汇报-ppt`：学术论文汇报风格（中文科研内容）。
 
+## 一键下载可编译示例包
+
+- 下载：[`examples.zip`](/_static/downloads/examples.zip)
+- 解压后进入 `examples/` 目录，直接执行：
+
+```bash
+xelatex main.tex
+```
+
+该压缩包已包含主题文件与字体资源（`assets/fonts/zh_CN-Adobe`）。
+
 ## 数据库课程示例（PDF）
 
 ```{raw} html
