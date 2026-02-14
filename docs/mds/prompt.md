@@ -1,6 +1,6 @@
 # Gemini 生成学术beamer
 
-![](/_static/imgs/20251215-gemini-beamer.png)
+![](../_static/imgs/20251215-gemini-beamer.png)
 
 ## 提示词
 
@@ -57,7 +57,7 @@ Finally, note that in the canvas environment, special characters like & and % ne
 
 ```{raw} html
    <object
-	data="/_static/pdfs/ldagcl-gemini-default.pdf"
+	data="../_static/pdfs/ldagcl-gemini-default.pdf"
 	type="application/pdf"
 	width="100%"
 	height="450px"
@@ -65,7 +65,7 @@ Finally, note that in the canvas environment, special characters like & and % ne
    >
    	<p>
    		Your browser does not support PDFs.
-   		<a href="/_static/pdfs/ldagcl-gemini-default.pdf">Download the PDF</a>
+   		<a href="../_static/pdfs/ldagcl-gemini-default.pdf">Download the PDF</a>
    	</p>
    </object>
 
@@ -76,7 +76,7 @@ Finally, note that in the canvas environment, special characters like & and % ne
 
 ```{raw} html
    <object
-	data="/_static/pdfs/ldagcl-simpleswu.pdf"
+	data="../_static/pdfs/ldagcl-simpleswu.pdf"
 	type="application/pdf"
 	width="100%"
 	height="450px"
@@ -84,7 +84,7 @@ Finally, note that in the canvas environment, special characters like & and % ne
    >
    	<p>
    		Your browser does not support PDFs.
-   		<a href="/_static/pdfs/ldagcl-simpleswu.pdf">Download the PDF</a>
+   		<a href="../_static/pdfs/ldagcl-simpleswu.pdf">Download the PDF</a>
    	</p>
    </object>
 ```
@@ -94,7 +94,7 @@ Finally, note that in the canvas environment, special characters like & and % ne
 
 ```{raw} html
    <object
-	data="/_static/pdfs/ldagcl-simpleswu-43.pdf"
+	data="../_static/pdfs/ldagcl-simpleswu-43.pdf"
 	type="application/pdf"
 	width="100%"
 	height="450px"
@@ -102,7 +102,7 @@ Finally, note that in the canvas environment, special characters like & and % ne
    >
    	<p>
    		Your browser does not support PDFs.
-   		<a href="/_static/pdfs/ldagcl-simpleswu-43.pdf">Download the PDF</a>
+   		<a href="../_static/pdfs/ldagcl-simpleswu-43.pdf">Download the PDF</a>
    	</p>
    </object>
 ```

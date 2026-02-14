@@ -1,65 +1,43 @@
-# college-swu-beamer ✨
+# simple-swu-beamer
 
+`simple-swu-beamer` 是我设计和维护的西南大学风格 Beamer 主题，用于课程汇报、论文答辩与学术展示。
 
-College SWU Beamer (LaTeX) 西大简约模板 **Unofficial**
+## 主题特性
 
-
-
-## Idea 🀄
-
-This project is going to show some **college but elegant** beamer templates.
-
-
-
-## Introduction 🧀
-
-In this project, I will show some beamer templates for SWUer.
-
-
-### Sintef
-
-This template is the  secondary creations of [SINTEF Presentation template](https://www.overleaf.com/latex/templates/sintef-presentation/jhbhdffczpnx).
-
-The example can be found [here](../gh-pages/examples/db-chapter8.pdf?raw=true)
-
-
-|![](../gh-pages/galleries/db-chapter8.pdf-0.jpg) | ![](../gh-pages/galleries/db-chapter8.pdf-1.jpg) |
-| :----: | :----: | 
-|![](../gh-pages/galleries/db-chapter8.pdf-2.jpg) | ![](../gh-pages/galleries/db-chapter8.pdf-3.jpg) |
-
-## Docs 📚
-
-See `docs/` for Sphinx documentation. GitHub Pages will be built by the workflow in `.github/workflows/docs.yml`.
-
-### Local docs workflow
-
-- Dev mode (auto reload): `./run_docs.sh dev`
-- Release mode (one-shot build): `./run_docs.sh release`
-- Full local CI-style check: `./run_test.sh`
-  - `run_test.sh` will copy `simple_swu_beamer/` resources (`beamerthemesimpleswu.sty`, `customize.tex`, `sintefcolor.sty`, `assets/`) into `examples/*` before compilation.
-
-### Release bundle
-
-- Build downloadable examples bundle: `./scripts/package_examples.sh`
-- Output file: `dist/examples.zip`
-
-## Examples 🧪
-
-Examples live in `examples/`. Use `examples/_template` as the scaffold for new cases.
-Theme source of truth is `simple_swu_beamer/beamerthemesimpleswu.sty`.
+- 基于 XeLaTeX 的中文友好方案（包含字体资源）
+- 提供课程风格与论文汇报风格示例
+- 支持 16:9 与 4:3 场景
+- 提供 GitHub Pages 文档与一键下载示例包
 
 
 
-## Related Interesting Works 🎉
+## 快速开始
 
-+ [huangjunjie-cs/simple-ucas-beamer](https://github.com/huangjunjie-cs/simple-ucas-beamer)
-+ [huangjunjie-cs/simple-swu-beamer](https://github.com/huangjunjie-cs/simple-swu-beamer)
-+ [liu-qilong/college-beamer](https://github.com/liu-qilong/college-beamer)
+1. 进入示例模板目录并编译：
 
+```bash
+cd examples/_template
+xelatex main.tex
+```
 
-## Statement 😑
+2. 或直接运行本地完整检查：
 
-This project is **NOT** related to **ANY Official department of Southwest Univeristy**。
+```bash
+./run_test.sh
+```
 
-> [!CAUTION]
-> 本项目和西南大学任何官方部门无关。
+## 文档与下载
+
+- 在线文档：[GitHub Pages](https://huangjunjie-cs.github.io/simple-swu-beamer/)
+- 示例页（含 PDF 预览）：[Examples](https://huangjunjie-cs.github.io/simple-swu-beamer/secs/examples.html)
+- 一键下载示例包（含字体）：[examples.zip](https://huangjunjie-cs.github.io/simple-swu-beamer/_static/downloads/examples.zip)
+
+## 目录结构
+
+- `simple_swu_beamer/`：主题源码与字体、页脚素材
+- `examples/`：示例工程与模板
+- `docs/`：Sphinx 文档
+
+## 声明
+
+本项目为个人设计与维护项目，与西南大学官方部门无关。

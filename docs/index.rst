@@ -10,9 +10,8 @@ Welcome to simple-swu-beamer's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   secs/install.md
-   secs/usage.md
    secs/examples.md
+   secs/install.md
    secs/faq.md
    mds/prompt.md
 

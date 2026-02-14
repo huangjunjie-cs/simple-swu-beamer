@@ -103,11 +103,11 @@ jobs:
             zip -rq "$GITHUB_WORKSPACE/docs/_static/downloads/examples.zip" "examples"
           )
 
-      - name: Build docs
-        run: uv run sphinx-build -b html docs docs/_build/html
-
       - name: Generate PDF preview images
         run: uv run python docs/pdf2imgs.py
+
+      - name: Build docs
+        run: uv run sphinx-build -b html docs docs/_build/html
 
       - name: Upload pages artifact
         uses: actions/upload-pages-artifact@v3

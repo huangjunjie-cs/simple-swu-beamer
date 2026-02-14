@@ -7,7 +7,7 @@
 
 ## 一键下载可编译示例包
 
-- 下载：[`examples.zip`](/_static/downloads/examples.zip)
+- 下载：<a href="../_static/downloads/examples.zip">examples.zip</a>
 - 解压后进入 `examples/` 目录，直接执行：
 
 ```bash
@@ -20,7 +20,7 @@ xelatex main.tex
 
 ```{raw} html
    <object
-     data="/_static/pdfs/db-chapter8.pdf"
+     data="../_static/pdfs/db-chapter8.pdf"
      type="application/pdf"
      width="100%"
      height="520px"
@@ -28,23 +28,23 @@ xelatex main.tex
    >
      <p>
        Your browser does not support PDFs.
-       <a href="/_static/pdfs/db-chapter8.pdf">Download the PDF</a>
+       <a href="../_static/pdfs/db-chapter8.pdf">Download the PDF</a>
      </p>
    </object>
 ```
 
 ## 数据库课程示例（预览）
 
-![db-examples-0](/_static/imgs/db-chapter8.pdf-0.jpg)
-![db-examples-1](/_static/imgs/db-chapter8.pdf-1.jpg)
-![db-examples-2](/_static/imgs/db-chapter8.pdf-2.jpg)
-![db-examples-3](/_static/imgs/db-chapter8.pdf-3.jpg)
+![db-examples-0](../_static/imgs/db-chapter8.pdf-0.jpg)
+![db-examples-1](../_static/imgs/db-chapter8.pdf-1.jpg)
+![db-examples-2](../_static/imgs/db-chapter8.pdf-2.jpg)
+![db-examples-3](../_static/imgs/db-chapter8.pdf-3.jpg)
 
 ## 论文汇报示例（PDF）
 
 ```{raw} html
    <object
-     data="/_static/pdfs/ldagcl-simpleswu.pdf"
+     data="../_static/pdfs/ldagcl-simpleswu.pdf"
      type="application/pdf"
      width="100%"
      height="520px"
@@ -52,15 +52,15 @@ xelatex main.tex
    >
      <p>
        Your browser does not support PDFs.
-       <a href="/_static/pdfs/ldagcl-simpleswu.pdf">Download the PDF</a>
+       <a href="../_static/pdfs/ldagcl-simpleswu.pdf">Download the PDF</a>
      </p>
    </object>
 ```
 
 ## 论文汇报示例（预览）
 
-![ldagcl-0](/_static/imgs/ldagcl-simpleswu.pdf-0.jpg)
-![ldagcl-1](/_static/imgs/ldagcl-simpleswu.pdf-1.jpg)
+![ldagcl-0](../_static/imgs/ldagcl-simpleswu.pdf-0.jpg)
+![ldagcl-1](../_static/imgs/ldagcl-simpleswu.pdf-1.jpg)
 
 ## 生成截图
 
