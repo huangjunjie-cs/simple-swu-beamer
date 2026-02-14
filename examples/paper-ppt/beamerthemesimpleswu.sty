@@ -16,6 +16,7 @@
 \RequirePackage{amsmath}
 \RequirePackage{amsfonts}
 \RequirePackage{amssymb}
+\RequirePackage{listings}
 \RequirePackage{textcomp}
 \RequirePackage{xcolor}
 \RequirePackage{lmodern}
@@ -128,12 +129,25 @@
 % =========================================================
 \setbeamercolor{palette primary}{bg=SWUBlue, fg=white}
 
-% Background footer image on every slide
-% (overlay node anchored at bottom)
+% Background footer image on every slide (path-compatible for different example dirs)
+\newcommand{\swufooterasset}{}
+\IfFileExists{assets/swu-footer-1.pdf}{
+  \renewcommand{\swufooterasset}{assets/swu-footer-1.pdf}
+}{
+  \IfFileExists{../paper-ppt/assets/swu-footer-1.pdf}{
+    \renewcommand{\swufooterasset}{../paper-ppt/assets/swu-footer-1.pdf}
+  }{
+    \IfFileExists{examples/paper-ppt/assets/swu-footer-1.pdf}{
+      \renewcommand{\swufooterasset}{examples/paper-ppt/assets/swu-footer-1.pdf}
+    }{}
+  }
+}
 \usebackgroundtemplate{
   \tikz[overlay, remember picture]
     \node[anchor=south, at=(current page.south), yshift=-8pt]{
-      \includegraphics[width=\paperwidth]{assets/swu-footer-1.pdf}
+      \ifx\swufooterasset\empty\else
+        \includegraphics[width=\paperwidth]{\swufooterasset}
+      \fi
     };
 }
 
@@ -200,22 +214,45 @@
 \RequirePackage{fontspec}
 \RequirePackage{xeCJK}
 
-\defaultfontfeatures{Path = assets/fonts/zh_CN-Adobe/, Mapping=tex-text}
-
-\setCJKmainfont[
-  BoldFont=AdobeHeitiStd-Regular.otf,
-  ItalicFont=AdobeKaitiStd-Regular.otf,
-  SmallCapsFont=AdobeHeitiStd-Regular.otf
-]{AdobeSongStd-Light.otf}
-
-\setCJKsansfont{AdobeHeitiStd-Regular.otf}
-\setCJKmonofont{AdobeFangsongStd-Regular.otf}
-
-% Convenient CJK family switches
-\setCJKfamilyfont{zhsong}{AdobeSongStd-Light.otf}
-\setCJKfamilyfont{zhhei}{AdobeHeitiStd-Regular.otf}
-\setCJKfamilyfont{zhfs}{AdobeFangsongStd-Regular.otf}
-\setCJKfamilyfont{zhkai}{AdobeKaitiStd-Regular.otf}
+\ifXeTeX
+  \IfFileExists{assets/fonts/zh_CN-Adobe/AdobeSongStd-Light.otf}{
+    \defaultfontfeatures{Path = assets/fonts/zh_CN-Adobe/, Mapping=tex-text}
+    \setCJKmainfont[
+      BoldFont=AdobeHeitiStd-Regular.otf,
+      ItalicFont=AdobeKaitiStd-Regular.otf,
+      SmallCapsFont=AdobeHeitiStd-Regular.otf
+    ]{AdobeSongStd-Light.otf}
+    \setCJKsansfont{AdobeHeitiStd-Regular.otf}
+    \setCJKmonofont{AdobeFangsongStd-Regular.otf}
+    \setCJKfamilyfont{zhsong}{AdobeSongStd-Light.otf}
+    \setCJKfamilyfont{zhhei}{AdobeHeitiStd-Regular.otf}
+    \setCJKfamilyfont{zhfs}{AdobeFangsongStd-Regular.otf}
+    \setCJKfamilyfont{zhkai}{AdobeKaitiStd-Regular.otf}
+  }{
+    \IfFileExists{../paper-ppt/assets/fonts/zh_CN-Adobe/AdobeSongStd-Light.otf}{
+      \defaultfontfeatures{Path = ../paper-ppt/assets/fonts/zh_CN-Adobe/, Mapping=tex-text}
+      \setCJKmainfont[
+        BoldFont=AdobeHeitiStd-Regular.otf,
+        ItalicFont=AdobeKaitiStd-Regular.otf,
+        SmallCapsFont=AdobeHeitiStd-Regular.otf
+      ]{AdobeSongStd-Light.otf}
+      \setCJKsansfont{AdobeHeitiStd-Regular.otf}
+      \setCJKmonofont{AdobeFangsongStd-Regular.otf}
+      \setCJKfamilyfont{zhsong}{AdobeSongStd-Light.otf}
+      \setCJKfamilyfont{zhhei}{AdobeHeitiStd-Regular.otf}
+      \setCJKfamilyfont{zhfs}{AdobeFangsongStd-Regular.otf}
+      \setCJKfamilyfont{zhkai}{AdobeKaitiStd-Regular.otf}
+    }{
+      \setCJKmainfont{Source Han Sans SC}
+      \setCJKsansfont{Source Han Sans SC}
+      \setCJKmonofont{Source Han Sans SC}
+      \setCJKfamilyfont{zhsong}{Source Han Sans SC}
+      \setCJKfamilyfont{zhhei}{Source Han Sans SC}
+      \setCJKfamilyfont{zhfs}{Source Han Sans SC}
+      \setCJKfamilyfont{zhkai}{Source Han Sans SC}
+    }
+  }
+\fi
 
 \newcommand*{\songti}{\CJKfamily{zhsong}} % 宋体
 \newcommand*{\heiti}{\CJKfamily{zhhei}}   % 黑体
@@ -290,7 +327,7 @@
 % =========================================================
 % Handy reference macros
 % =========================================================
-\newcommand{\tinycite}[2][2]{{~\tiny{(\citeauthor[#1]{#2}})}}
+\newcommand{\tinycite}[2][2]{{~\tiny{(\citeauthor[#1]{#2})}}}
 \newcommand{\Real}{\ensuremath{\mathbb{R}}}
 \newcommand{\secref}[1]{Section~\ref{#1}}
 \newcommand{\figref}[1]{Fig~\ref{#1}}
@@ -305,32 +342,29 @@
 
 \defbeamertemplate*{title page}{simpleswu}[1][]{
   {
-    \usebackgroundtemplate{} % no footer background on title page
-    \begin{frame}[noframenumbering,plain]
-      \vbox{}\vfill
-      \begingroup\centering
-        \begin{beamercolorbox}[sep=8pt,center,#1]{title}
-          \usebeamerfont{title}\inserttitle\par
-          \ifx\insertsubtitle\@empty\else
-            \vskip0.25em
-            \usebeamerfont{subtitle}\usebeamercolor[fg]{subtitle}\insertsubtitle\par
-          \fi
-        \end{beamercolorbox}
-        \vskip1em
-        \begin{beamercolorbox}[sep=8pt,center,#1]{author}
-          \usebeamerfont{author}\insertauthor
-        \end{beamercolorbox}
-        \begin{beamercolorbox}[sep=8pt,center,#1]{institute}
-          \usebeamerfont{institute}\insertinstitute
-        \end{beamercolorbox}
-        \begin{beamercolorbox}[sep=8pt,center,#1]{date}
-          \usebeamerfont{date}\insertdate
-        \end{beamercolorbox}
-        \vskip0.5em
-        {\usebeamercolor[fg]{titlegraphic}\inserttitlegraphic\par}
-      \endgroup
-      \vfill
-    \end{frame}
+    \vbox{}\vfill
+    \begingroup\centering
+      \begin{beamercolorbox}[sep=8pt,center,#1]{title}
+        \usebeamerfont{title}\inserttitle\par
+        \ifx\insertsubtitle\@empty\else
+          \vskip0.25em
+          \usebeamerfont{subtitle}\usebeamercolor[fg]{subtitle}\insertsubtitle\par
+        \fi
+      \end{beamercolorbox}
+      \vskip1em
+      \begin{beamercolorbox}[sep=8pt,center,#1]{author}
+        \usebeamerfont{author}\insertauthor
+      \end{beamercolorbox}
+      \begin{beamercolorbox}[sep=8pt,center,#1]{institute}
+        \usebeamerfont{institute}\insertinstitute
+      \end{beamercolorbox}
+      \begin{beamercolorbox}[sep=8pt,center,#1]{date}
+        \usebeamerfont{date}\insertdate
+      \end{beamercolorbox}
+      \vskip0.5em
+      {\usebeamercolor[fg]{titlegraphic}\inserttitlegraphic\par}
+    \endgroup
+    \vfill
   }
 }
 

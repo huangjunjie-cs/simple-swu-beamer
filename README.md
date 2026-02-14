@@ -31,9 +31,22 @@ The example can be found [here](../gh-pages/examples/db-chapter8.pdf?raw=true)
 
 See `docs/` for Sphinx documentation. GitHub Pages will be built by the workflow in `.github/workflows/docs.yml`.
 
+### Local docs workflow
+
+- Dev mode (auto reload): `./run_docs.sh dev`
+- Release mode (one-shot build): `./run_docs.sh release`
+- Full local CI-style check: `./run_test.sh`
+  - `run_test.sh` will copy `simple_swu_beamer/` resources (`beamerthemesimpleswu.sty`, `customize.tex`, `sintefcolor.sty`, `assets/`) into `examples/*` before compilation.
+
+### Release bundle
+
+- Build downloadable examples bundle: `./scripts/package_examples.sh`
+- Output file: `dist/examples.zip`
+
 ## Examples 🧪
 
 Examples live in `examples/`. Use `examples/_template` as the scaffold for new cases.
+Theme source of truth is `simple_swu_beamer/beamerthemesimpleswu.sty`.
 
 
 

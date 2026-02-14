@@ -23,14 +23,23 @@ brew install poppler
 uv run python docs/pdf2imgs.py
 ```
 
-3. 进入示例目录：`examples/db-examples` 或 `examples/paper-ppt`。
-4. 编译：
+3. 推荐直接跑完整本地检查（会自动同步主题资源到 `examples/*` 后再编译）：
 
 ```bash
-xelatex main.tex
-bibtex main
-xelatex main.tex
-xelatex main.tex
+./run_test.sh
+```
+
+4. 如果你只想单独编译某个示例，先同步资源，再编译：
+
+```bash
+cp simple_swu_beamer/beamerthemesimpleswu.sty examples/db-examples/
+cp simple_swu_beamer/customize.tex examples/db-examples/
+cp simple_swu_beamer/sintefcolor.sty examples/db-examples/
+mkdir -p examples/db-examples/assets
+cp simple_swu_beamer/assets/swu-footer*.pdf examples/db-examples/assets/
+
+cd examples/db-examples
+latexmk -xelatex -interaction=nonstopmode -halt-on-error -file-line-error db-chapter8.tex
 ```
 
 ## 在 Overleaf 使用
@@ -46,4 +55,4 @@ xelatex main.tex
 
 ## 字体
 
-若需要中文字体支持，可参考 `examples/论文汇报-ppt/assets/fonts`。
+若需要中文字体支持，可参考 `examples/paper-ppt/assets/fonts`。

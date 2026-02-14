@@ -1,272 +1,419 @@
-% Template for SINTEF presentations with LaTeX beamer.
-%
-% by Federico Zenith, federico.zenith@sintef.no.
-% Derived (through several iterations) from Håvard Berland's
-% beamerthementnu class.
-%
-% This program is free software: you can redistribute it and/or modify
-% it under the terms of the GNU General Public License as published by
-% the Free Software Foundation, either version 3 of the License, or
-% (at your option) any later version.
-%
-% This program is distributed in the hope that it will be useful,
-% but WITHOUT ANY WARRANTY; without even the implied warranty of
-% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-% GNU General Public License for more details.
-%
-% You should have received a copy of the GNU General Public License
-% along with this program.  If not, see <http://www.gnu.org/licenses/>.
+\NeedsTeXFormat{LaTeX2e}
+\mode<presentation>
 
-\ProvidesPackage{beamerthemesintef}[2021/11/02]
-
-\RequirePackage{etoolbox}
+% =========================================================
+% Core packages (graphics, math, tables)
+% =========================================================
 \RequirePackage{tikz}
+\RequirePackage[utf8]{inputenc}      % NOTE: XeLaTeX 下通常不需要，但保留以兼容
+\RequirePackage[T1]{fontenc}         % NOTE: XeLaTeX 下 latin 字体多用 fontspec
+\RequirePackage{graphicx}
+\RequirePackage{grffile}
+\RequirePackage{longtable}
+\RequirePackage{wrapfig}
+\RequirePackage{rotating}
+\RequirePackage[normalem]{ulem}
+\RequirePackage{amsmath}
+\RequirePackage{amsfonts}
+\RequirePackage{amssymb}
 \RequirePackage{listings}
+\RequirePackage{textcomp}
+\RequirePackage{xcolor}
+\RequirePackage{lmodern}
+\RequirePackage{tcolorbox}
+\RequirePackage{multicol}
+\RequirePackage[round]{natbib}
+\RequirePackage[font=scriptsize,labelfont=bf]{caption}
 
-% Force 16:9 aspect ratio
-\RequirePackage{geometry}
-\geometry{paperwidth=16cm,paperheight=9cm}
+% Hyperref setup (two-stage: early “hidelinks”, later “colorlinks”)
+\hypersetup{
+  hidelinks,
+  citecolor=black
+}
 
-% Caladea is a Cambria clone, Carlito a Calibri clone
-\RequirePackage{caladea,carlito}
-\renewcommand{\familydefault}{\sfdefault}
-\usepackage[round]{natbib}
-\RequirePackage{graphicx,sintefcolor}
+% =========================================================
+% Theme options / flags
+% =========================================================
+\newif\ifbeamer@secheader
+\beamer@secheaderfalse
 
+\DeclareOptionBeamer{secheader}{\beamer@secheadertrue}
+\ProcessOptionsBeamer
+
+% =========================================================
+% Color palette (institution colors)
+% =========================================================
+\definecolor{SWUBlue}{rgb}{0.0, 0.239, 0.514}
+\definecolor{ICTBlue}{rgb}{0.0, 0.239, 0.514}
+\definecolor{PKURed}{rgb}{0.545, 0, 0.071}
+
+% =========================================================
+% Beamer theme composition
+%   - default theme: minimal structural templates
+%   - whale colortheme: blue-ish palettes
+%   - circles innertheme: bullet styles, block aesthetics
+%   - shadow outertheme: adds shadow-like separation for header/footer
+% =========================================================
 \usetheme{default}
-% \usecolortheme{whale}
+\usecolortheme{whale}
 \usefonttheme[onlymath]{serif}
 \useinnertheme{circles}
 
+% Outer theme shadow often introduces a headline navigation bar.
+% We keep shadow's styling but remove the headline content entirely.
 
-% No navigation symbols
-\setbeamertemplate{navigation symbols}{}
+% 不要顶部导航
+\setbeamertemplate{headline}{}
 
-\newcommand{\@footlinepayoff}{\@SINTEFmotto}
-\setbeamertemplate{footline}{%
-  \begin{beamercolorbox}[wd=\textwidth,ht=4mm,dp=2.4mm,rightskip=-1cm]{footline}
-  \usebeamerfont{footline}\hfill\@footlinepayoff
-  \end{beamercolorbox}
-}
+% --- Frametitile: SWUBlue bar + soft vertical shadow (like your Fig.2) ---
+\setbeamercolor{frametitle}{bg=SWUBlue, fg=white}
 
-% Set footline AND coordinate blocks with it
-\newcommand{\footlinecolor}[1]{% if #1 is empty, makes footline transparent
-  \ifstrempty{#1}{%
-    \renewcommand{\@footlinepayoff}{}
-    \setbeamercolor{footline}{bg=}
-    \setbeamercolor{block title}{fg=white,bg=sintefblue}
-    \setbeamercolor{block body}{fg=white,bg=sintefblue}
-  }{
-    \renewcommand{\@footlinepayoff}{\@SINTEFmotto}
-    \setbeamercolor{footline}{fg=white,bg=#1}
-    \setbeamercolor{block title}{fg=white,bg=#1}
-    \setbeamercolor{block body}{fg=white,bg=#1}
-  }%
-}
-\footlinecolor{} % Default: no footline
+\newlength{\swu@ftleft}
+\setlength{\swu@ftleft}{1.0em} % 标题左边距，可调
 
-\pgfdeclareimage[width=0.09\paperwidth]{bluelogo}{images/SINTEF_Logo_Sentrert_RGB}
-\pgfdeclareimage[width=0.09\paperwidth]{whitelogo}{images/SINTEF_Logo_Sentrert_Negativ_RGB}
-\newcommand{\@SINTEFlogo}{bluelogo}
+\newlength{\swu@shadowh}
+\setlength{\swu@shadowh}{1.0ex} % 阴影高度，可调（图2大概 1.2ex~2.0ex）
 
-% Set colours
-% NOTE! Beamer colors should be set in the preamble. It often works fine in the
-%       document itself, but NOT for normal text foreground.
-%       \themecolor should only be called from the preamble.
-\newcommand{\themecolor}[1]{
-	\ifstrequal{#1}{blue}{%
-		\setbeamercolor{normal text}{fg=white,bg=sintefblue}
-		\setbeamercolor{structure}{fg=white}
-		\renewcommand{\@SINTEFlogo}{whitelogo}
-		\setbeamercolor{block title}{fg=sintefblue,bg=sintefgrey}
-		\setbeamercolor{block body}{fg=sintefblue,bg=sintefgrey}
-	}{%
-		\setbeamercolor{normal text}{fg=darkgray,bg=white}
-		\setbeamercolor{structure}{fg=sintefblue}
-		\renewcommand{\@SINTEFlogo}{bluelogo}
-		\setbeamercolor{block title}{fg=airforceblue,bg=morelightgray}
-		\setbeamercolor{block body}{fg=darkgray,bg=morelightgray}
-	}
-}
-\themecolor{white} % Default: white theme
 
-\setbeamercolor{title}{fg=sintefblue}
-\setbeamercolor{alerted text}{fg=sintefred}
-\setbeamercolor{author}{fg=black}
-\setbeamercolor{date}{fg=black}
-
-\setbeamerfont{author}{size=\scriptsize}
-\setbeamerfont{date}{size=\tiny}
-\setbeamerfont{title}{series=\bfseries}
-\setbeamerfont{subtitle}{series=\mdseries,size=\footnotesize}
-\setbeamerfont{frametitle}{series=\bfseries}
-\setbeamerfont{framesubtitle}{series=\mdseries}
-\setbeamerfont{footline}{size=\scriptsize}
-\setbeamerfont{block title}{series=\centering, size=\small}
-\setbeamerfont{block body}{size=\scriptsize}
-
-% Code to get prettier boxes
-\setbeamertemplate{blocks}[rounded]%, shadow=true]
-
-\newenvironment{colorblock}[3][white]{%
-	\begingroup
-	\setbeamercolor{block title}{fg=#1,bg=#2}
-	\setbeamercolor{block body} {fg=#1,bg=#2}
-	\begin{block}{#3}
-	}{%
-	\end{block}
-	\endgroup
-}
-
-% Put the logo in each slide's top left area
-\setbeamertemplate{headline}{\hspace{0.06\textwidth}\pgfuseimage{\@SINTEFlogo}}
-
-% Define frame title and subtitle layout
+\makeatletter
 \setbeamertemplate{frametitle}{%
-  \vspace*{-3.5ex}
-  \begin{beamercolorbox}[leftskip=2cm]{frametitle}%
-    \usebeamerfont{frametitle}\insertframetitle\\
-    \usebeamerfont{framesubtitle}\insertframesubtitle
-  \end{beamercolorbox}
+  \nointerlineskip%
+  % 1) 标题栏本体
+  \begin{beamercolorbox}[
+    wd=\paperwidth,
+    ht=2.5ex,
+    dp=1ex,
+    sep=0pt,
+    leftskip=\swu@ftleft,
+    rightskip=0.8em
+  ]{frametitle}%
+    \usebeamerfont{frametitle}\insertframetitle%
+  \end{beamercolorbox}%
+  % 2) 真实阴影：竖向渐变（上深下浅），紧贴在标题栏下方
+\par\nointerlineskip%
+\begin{beamercolorbox}[wd=\paperwidth,ht=\swu@shadowh,dp=0ex,sep=0pt,leftskip=0pt,rightskip=0pt]{}
+  \begin{tikzpicture}[x=1pt,y=1pt]
+    \path[
+      shade,
+      shading angle=90,
+      top color=black!35,
+      bottom color=black!0
+    ] (0,0) rectangle (\paperwidth,\swu@shadowh);
+  \end{tikzpicture}%
+\end{beamercolorbox}%
+\nointerlineskip%
+
+}
+\makeatother
+
+% =========================================================
+% Section transition: show outline at the beginning of each section
+% =========================================================
+\AtBeginSection[]{
+  \begin{frame}<beamer>
+    \frametitle{Outline}
+    \tableofcontents[currentsection]
+  \end{frame}
+  \subsection{}
 }
 
-% Define the title page
-\setbeamertemplate{title page}{%
-  \vskip0pt plus 1filll%
-  \hspace{-12mm}% Pull back the box in an inelegant way - but it works!
-  \begin{beamercolorbox}[wd=0.9\textwidth,sep=15pt,leftskip=8mm]{title}%
-    {\usebeamerfont{title}\inserttitle}
 
-    {\usebeamerfont{subtitle}\insertsubtitle}
 
-    {\usebeamerfont{author}\usebeamercolor[fg]{author}\insertauthor}
 
-    {\usebeamerfont{date}\usebeamercolor[fg]{date}\insertdate}
-  \end{beamercolorbox}
+
+% Enable colored links (this overrides earlier hidelinks intent for links)
+\hypersetup{colorlinks=true, linkcolor=blue}
+
+% =========================================================
+% Global colors / layout knobs
+% =========================================================
+\setbeamercolor{palette primary}{bg=SWUBlue, fg=white}
+
+% Background footer image on every slide (path-compatible for different example dirs)
+\newcommand{\swufooterasset}{}
+\IfFileExists{assets/swu-footer-1.pdf}{
+  \renewcommand{\swufooterasset}{assets/swu-footer-1.pdf}
+}{
+  \IfFileExists{../paper-ppt/assets/swu-footer-1.pdf}{
+    \renewcommand{\swufooterasset}{../paper-ppt/assets/swu-footer-1.pdf}
+  }{
+    \IfFileExists{examples/paper-ppt/assets/swu-footer-1.pdf}{
+      \renewcommand{\swufooterasset}{examples/paper-ppt/assets/swu-footer-1.pdf}
+    }{}
+  }
 }
-
-\newcommand{\TikzSplitSlide}[1]{%
-  \rule{0.4\paperwidth}{0pt}%
-  \begin{tikzpicture}
-    \clip (-0.1\paperwidth,-0.5\paperheight) --
-          ( 0.5\paperwidth,-0.5\paperheight) --
-          ( 0.5\paperwidth, 0.5\paperheight) --
-          ( 0.1\paperwidth, 0.5\paperheight) -- cycle;
-    \node at (0.2\paperwidth,0) {%
-      \includegraphics[height=\paperheight]{#1}%
+\usebackgroundtemplate{
+  \tikz[overlay, remember picture]
+    \node[anchor=south, at=(current page.south), yshift=-8pt]{
+      \ifx\swufooterasset\empty\else
+        \includegraphics[width=\paperwidth]{\swufooterasset}
+      \fi
     };
-  \end{tikzpicture}
 }
 
-\newbool{splittitle}
-\newcommand{\@TitleBackground}{}
-\newcommand{\titlebackground}{\@ifstar{\SplitBackground}{\FullBackground}}
-\newcommand{\FullBackground}[1]{\renewcommand{\@TitleBackground}{#1}}
-\newcommand{\SplitBackground}[1]{%
-	\booltrue{splittitle}%
-	\renewcommand{\@TitleBackground}{#1}%
+% Footline: simple frame number
+\setbeamertemplate{footline}[frame number]
+% 让正文区更宽（更接近 Madrid）
+\setbeamersize{text margin left=1em, text margin right=1.0em}
+
+
+% Table-of-contents style: numbered sections
+% \setbeamertemplate{section in toc}[sections numbered]
+\setbeamertemplate{section in toc}{%
+  \leavevmode%
+  \hspace*{0.5em}
+  \makebox[2.0em][l]{% 这里控制“编号区宽度”
+    \tikz[baseline=(n.base)]{
+      \node[
+        circle, fill=SWUBlue, inner sep=1.2pt,
+        text=white, font=\scriptsize\bfseries
+      ] (n) {\inserttocsectionnumber};
+    }%
+  }%
+  \inserttocsection\par%
 }
 
-\renewcommand{\maketitle}{
-\begingroup
-  \setbeamertemplate{footline}{}
-  \ifdefempty{\@TitleBackground}{}{% Skip if \@TitleBackground is empty
-    \setbeamertemplate{background}{%
-      \ifbool{splittitle}{%
-        \TikzSplitSlide{\@TitleBackground}
-      }{% Normal, full-screen background
-        \begin{tikzpicture}[remember picture,overlay]
-        \node[anchor=south east] at (current page.south east) {\includegraphics[width=\paperwidth]{\@TitleBackground}};
-        \end{tikzpicture}
-      }
+
+% % List indentation (note: beamer ignores some list params depending on templates)
+% \setlength{\leftmargini}{0.0cm}
+% \setlength{\leftmarginii}{0.5cm}
+% \setlength{\leftmarginiii}{0.5cm}
+
+% Itemize/enumerate colors
+\setbeamercolor{itemize/enumerate body}{fg=black}
+\setbeamercolor{itemize/enumerate subbody}{fg=black}
+\setbeamercolor{itemize/enumerate subsubbody}{fg=black}
+
+% =========================================================
+% Itemize symbols & spacing
+% =========================================================
+\RequirePackage{fontawesome5}
+
+% Use square as main bullet template, and FontAwesome clone icon for subitems
+\setbeamertemplate{itemize item}{
+  \raisebox{0.25ex}{\scriptsize \faCircle[regular]}
+  \hspace{-0.6em}
+}
+\setbeamertemplate{itemize subitem}{
+  \raisebox{0.2ex}{\tiny \faDotCircle}
+  \hspace{-0.5em}
+}
+\setbeamertemplate{itemize subsubitem}{
+  \raisebox{0.15ex}{\tiny $\bullet$}
+  \hspace{-0.25em}
+}
+
+% \setbeamertemplate{itemize/enumerate body begin}{\large}
+
+% Remove navigation symbols (bottom-right buttons)
+\beamertemplatenavigationsymbolsempty
+
+% =========================================================
+% CJK fonts (XeLaTeX) - uses local Adobe font files
+% =========================================================
+\RequirePackage{fontspec}
+\RequirePackage{xeCJK}
+
+\ifXeTeX
+  \IfFileExists{assets/fonts/zh_CN-Adobe/AdobeSongStd-Light.otf}{
+    \defaultfontfeatures{Path = assets/fonts/zh_CN-Adobe/, Mapping=tex-text}
+    \setCJKmainfont[
+      BoldFont=AdobeHeitiStd-Regular.otf,
+      ItalicFont=AdobeKaitiStd-Regular.otf,
+      SmallCapsFont=AdobeHeitiStd-Regular.otf
+    ]{AdobeSongStd-Light.otf}
+    \setCJKsansfont{AdobeHeitiStd-Regular.otf}
+    \setCJKmonofont{AdobeFangsongStd-Regular.otf}
+    \setCJKfamilyfont{zhsong}{AdobeSongStd-Light.otf}
+    \setCJKfamilyfont{zhhei}{AdobeHeitiStd-Regular.otf}
+    \setCJKfamilyfont{zhfs}{AdobeFangsongStd-Regular.otf}
+    \setCJKfamilyfont{zhkai}{AdobeKaitiStd-Regular.otf}
+  }{
+    \IfFileExists{../paper-ppt/assets/fonts/zh_CN-Adobe/AdobeSongStd-Light.otf}{
+      \defaultfontfeatures{Path = ../paper-ppt/assets/fonts/zh_CN-Adobe/, Mapping=tex-text}
+      \setCJKmainfont[
+        BoldFont=AdobeHeitiStd-Regular.otf,
+        ItalicFont=AdobeKaitiStd-Regular.otf,
+        SmallCapsFont=AdobeHeitiStd-Regular.otf
+      ]{AdobeSongStd-Light.otf}
+      \setCJKsansfont{AdobeHeitiStd-Regular.otf}
+      \setCJKmonofont{AdobeFangsongStd-Regular.otf}
+      \setCJKfamilyfont{zhsong}{AdobeSongStd-Light.otf}
+      \setCJKfamilyfont{zhhei}{AdobeHeitiStd-Regular.otf}
+      \setCJKfamilyfont{zhfs}{AdobeFangsongStd-Regular.otf}
+      \setCJKfamilyfont{zhkai}{AdobeKaitiStd-Regular.otf}
+    }{
+      \setCJKmainfont{Source Han Sans SC}
+      \setCJKsansfont{Source Han Sans SC}
+      \setCJKmonofont{Source Han Sans SC}
+      \setCJKfamilyfont{zhsong}{Source Han Sans SC}
+      \setCJKfamilyfont{zhhei}{Source Han Sans SC}
+      \setCJKfamilyfont{zhfs}{Source Han Sans SC}
+      \setCJKfamilyfont{zhkai}{Source Han Sans SC}
     }
   }
-  \begin{frame}%
-      \Large\titlepage%
-  \end{frame}%
-\endgroup
+\fi
+
+\newcommand*{\songti}{\CJKfamily{zhsong}} % 宋体
+\newcommand*{\heiti}{\CJKfamily{zhhei}}   % 黑体
+\newcommand*{\kaishu}{\CJKfamily{zhfs}}   % 楷书(这里按你的原意映射为仿宋)
+\newcommand*{\fangsong}{\CJKfamily{zhfs}} % 仿宋
+
+% =========================================================
+% Algorithms / tables / figures
+% =========================================================
+\RequirePackage{algorithm2e}
+\RequirePackage{algorithmic}
+\RequirePackage{float}
+\RequirePackage{dsfont}
+\RequirePackage{booktabs}
+\RequirePackage{multirow}
+\RequirePackage{threeparttable}
+\RequirePackage{subfig}
+
+% =========================================================
+% TikZ libraries (for diagrams)
+% =========================================================
+\usetikzlibrary{
+  arrows.meta,
+  backgrounds,
+  positioning,
+  fit,
+  petri,
+  shapes,
+  arrows,
+  snakes,
+  decorations,
+  external,
+  calc,
+  patterns,
+  decorations.pathmorphing
 }
 
-\newenvironment{chapter}[3][]{% Args: image (optional), color, frame title
-  \begingroup
-  \themecolor{blue}
-  \setbeamertemplate{footline}{}
-  \ifstrequal{#2}{sinteflightgreen}{ % Use blue text on light green, else white
-    \setbeamercolor{frametitle}{fg=sintefblue}
-    \setbeamercolor{normal text}{fg=sintefblue,bg=#2}
-  }{
-    \setbeamercolor{frametitle}{fg=white}
-    \setbeamercolor{normal text}{fg=white,bg=#2}
+% =========================================================
+% Fine-tuned list spacing by depth (patch itemize/enumerate)
+% =========================================================
+\RequirePackage{xpatch}
+\makeatletter
+\newlength{\my@beamer@itemsepi}\setlength{\my@beamer@itemsepi}{0.6ex}
+\newlength{\my@beamer@itemsepii}\setlength{\my@beamer@itemsepii}{0.35ex}
+\newlength{\my@beamer@itemsepiii}\setlength{\my@beamer@itemsepiii}{0.2ex}
+
+\newcommand{\my@beamer@setsep}{%
+  \ifnum\@itemdepth=1\relax
+    \setlength\itemsep{\my@beamer@itemsepi}%
+  \else
+    \ifnum\@itemdepth=2\relax
+      \setlength\itemsep{\my@beamer@itemsepii}%
+    \else
+      \ifnum\@itemdepth=3\relax
+        \setlength\itemsep{\my@beamer@itemsepiii}%
+      \fi
+    \fi
+  \fi
+}
+
+\xpatchcmd{\itemize}{\def\makelabel}{\my@beamer@setsep\def\makelabel}{}{}
+\xpatchcmd{\beamer@enum@}{\def\makelabel}{\my@beamer@setsep\def\makelabel}{}{}
+
+% helper: change all three levels at once
+\newcommand\setlistsep[3]{%
+  \setlength{\my@beamer@itemsepi}{#1}%
+  \setlength{\my@beamer@itemsepii}{#2}%
+  \setlength{\my@beamer@itemsepiii}{#3}%
+}
+\makeatother
+
+% =========================================================
+% Handy reference macros
+% =========================================================
+\newcommand{\tinycite}[2][2]{{~\tiny{(\citeauthor[#1]{#2})}}}
+\newcommand{\Real}{\ensuremath{\mathbb{R}}}
+\newcommand{\secref}[1]{Section~\ref{#1}}
+\newcommand{\figref}[1]{Fig~\ref{#1}}
+\newcommand{\tableref}[1]{Table~\ref{#1}}
+\newcommand{\equref}[1]{Equation~\ref{#1}}
+\newcommand{\algref}[1]{Algorithm~\ref{#1}}
+
+% =========================================================
+% Title page: custom template (simpleswu)
+% =========================================================
+\setbeamertemplate{title page}[empty]
+
+\defbeamertemplate*{title page}{simpleswu}[1][]{
+  {
+    \vbox{}\vfill
+    \begingroup\centering
+      \begin{beamercolorbox}[sep=8pt,center,#1]{title}
+        \usebeamerfont{title}\inserttitle\par
+        \ifx\insertsubtitle\@empty\else
+          \vskip0.25em
+          \usebeamerfont{subtitle}\usebeamercolor[fg]{subtitle}\insertsubtitle\par
+        \fi
+      \end{beamercolorbox}
+      \vskip1em
+      \begin{beamercolorbox}[sep=8pt,center,#1]{author}
+        \usebeamerfont{author}\insertauthor
+      \end{beamercolorbox}
+      \begin{beamercolorbox}[sep=8pt,center,#1]{institute}
+        \usebeamerfont{institute}\insertinstitute
+      \end{beamercolorbox}
+      \begin{beamercolorbox}[sep=8pt,center,#1]{date}
+        \usebeamerfont{date}\insertdate
+      \end{beamercolorbox}
+      \vskip0.5em
+      {\usebeamercolor[fg]{titlegraphic}\inserttitlegraphic\par}
+    \endgroup
+    \vfill
   }
-  \ifstrempty{#1}{}{\setbeamertemplate{background}{\TikzSplitSlide{#1}}}
-  \setbeamertemplate{frametitle}{%
-    \vspace*{8ex}
-    \begin{beamercolorbox}[wd=0.45\textwidth]{frametitle}
-      \usebeamerfont{frametitle}\insertframetitle\\
-      \usebeamerfont{framesubtitle}\insertframesubtitle
-    \end{beamercolorbox}
+}
+
+
+% =========================================================
+% Blocks: make theorem/block look like "boxed + shadow"
+% =========================================================
+\setbeamertemplate{blocks}[rounded][shadow=true]
+\setbeamercolor{block title}{bg=PKURed!85!white, fg=white}
+\setbeamercolor{block body}{bg=black!5, fg=black}
+
+% 可选：example/alert 的颜色也一起统一
+\setbeamercolor{block title example}{bg=PKURed!85!black, fg=white}
+\setbeamercolor{block body example}{bg=black!4, fg=black}
+\setbeamercolor{block title alerted}{bg=PKURed!75!black, fg=white}
+\setbeamercolor{block body alerted}{bg=red!3, fg=black}
+
+
+% =========================================================
+% QA page (full blue background)
+% =========================================================
+\newcommand{\qapage}{
+  {
+    \usebackgroundtemplate{
+      \tikz[overlay,remember picture]
+        \fill[SWUBlue] (current page.south west) rectangle (current page.north east);
+    }
+    \begin{frame}[c,noframenumbering,plain]{}
+      \centering
+      \usebeamercolor[fg]{frametitle}
+      \Huge $$\mathcal Q \& \mathcal A$$
+      \Huge $$Thank\ you!$$
+      \Large \textbf{感谢您的聆听和反馈}
+    \end{frame}
   }
-  \begin{frame}{#3}
-  \hspace*{0.05\textwidth}%
-  \minipage{0.35\textwidth}%
-  \usebeamercolor[fg]{normal text}%
-}{%
-  \endminipage
+}
+
+% =========================================================
+% Reference page (appendix bibliography)
+% =========================================================
+\newcommand{\refpage}{
+  \section<presentation>*{\appendixname}
+  \subsection<presentation>*{Reference}
+  \begin{frame}[allowframebreaks,noframenumbering,plain]
+    \frametitle<presentation>{Reference}
+    \tiny
+    \bibliographystyle{abbrvnat}
+    \bibliography{refs}
   \end{frame}
-  \endgroup
 }
 
-\newenvironment{sidepic}[2]{% Args: image, frame title
-  \begingroup
-  \setbeamertemplate{background}{%
-  \hspace*{0.6\paperwidth}%
-  \includegraphics[height=\paperheight]{#1}%
-  }
-  \setbeamertemplate{frametitle}{% Same as normal, but with right skip
-    \vspace*{-3.5ex}
-    \begin{beamercolorbox}[leftskip=2cm,rightskip=0.4\textwidth]{frametitle}%
-      \usebeamerfont{frametitle}\insertframetitle\\
-      \usebeamerfont{framesubtitle}\insertframesubtitle
-    \end{beamercolorbox}
-  }
-  \begin{frame}{#2}
-  \minipage{0.8\textwidth}%
-}{%
-  \endminipage
-  \end{frame}
-  \endgroup
-}
-
-\newcommand{\@SINTEFmotto}{}
-\newcommand{\setmotto}{\renewcommand{\@SINTEFmotto}}
-\newcommand{\backmatter}{
-\begingroup
-  \setbeamertemplate{footline}{}
-  \themecolor{blue}
-  \begin{frame}[c]{}
-    \centering
-    \begin{minipage}{\textwidth}
-    	\usebeamercolor[fg]{normal text}
-	    \centering
-        \Huge $$\mathcal Q \& \mathcal A$$
-    \end{minipage}
-  \end{frame}
-\endgroup
-}
-
-% MY CUSTOMIZATION
-\newcommand{\strtoc}{目录}
-\newcommand{\strsubsec}{\thesection.\thesubsection 节}
-\input{customize}
-
-
-\usepackage{fontawesome5}
-\setbeamertemplate{itemize item}[square]{}
-\setbeamertemplate{itemize subitem}{\tiny \faClone[regular]}
-\setbeamertemplate{itemize/enumerate body begin}{\large}
-
-
-%%%%%%% DIY
-
-\setbeamertemplate{footline}[frame number]
-\setbeamercolor{page number in head/foot}{fg=black}
+\mode<all>

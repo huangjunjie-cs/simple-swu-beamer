@@ -41,17 +41,17 @@ END;
 \begin{enumerate}
     \item 变量和常量的定义
     \begin{itemize}
-        \item 变量名 数据类型 \lstinline{[[NOT NULL]:=初值表达式]}
-        \item 变量名 数据类型 \lstinline{[[NOT NULL] 初值表达式]}
+        \item 变量名 数据类型 \lstinline{[[NOT NULL] := expr]}
+        \item 变量名 数据类型 \lstinline{[[NOT NULL] expr]}
     \end{itemize}
     \item 常量定义
     \begin{itemize}
-        \item 常量名 数据类型 \lstinline{CONSTANT :=常量表达式}
+        \item 常量名 数据类型 \lstinline{CONSTANT := expr}
         \item 常量必须要赋予一个值，并且该值在存在期间或常量的作用域内不能改变。如果试图修改它，过程化SQL将返回一个异常
     \end{itemize}
     \item 赋值语句
     \begin{itemize}
-    \item \lstinline{变量名称 :=表达式}
+    \item \lstinline{var_name := expr}
     \end{itemize}
 \end{enumerate}
 \end{frame}
@@ -453,6 +453,5 @@ ALTER FUNCTION 函数名 COMPILE;
 \end{enumerate}
 
 \end{frame}
-
 
 
