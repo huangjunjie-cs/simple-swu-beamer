@@ -9,6 +9,37 @@
 - 支持 16:9 与 4:3 场景
 - 提供 GitHub Pages 文档与一键下载示例包
 
+## 预览
+
+<table>
+  <tr>
+    <td align="center">
+      <img src="./docs/readme-assets/db-chapter8.pdf-0.jpg" width="100%" alt="db-chapter8 preview">
+    </td>
+    <td align="center">
+      <img src="./docs/readme-assets/ldagcl-gemini-default.pdf-0.jpg" width="100%" alt="ldagcl-gemini-default preview">
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="./docs/readme-assets/ldagcl-simpleswu.pdf-0.jpg" width="100%" alt="ldagcl-simpleswu preview">
+    </td>
+    <td align="center">
+      <img src="./docs/readme-assets/ldagcl-simpleswu-43.pdf-0.jpg" width="100%" alt="ldagcl-simpleswu-43 preview">
+    </td>
+  </tr>
+</table>
+
+更新 README 预览图可执行：
+
+```bash
+./.venv/bin/python docs/pdf2imgs.py \
+  --pdf-dir docs/_static/pdfs \
+  --img-dir docs/readme-assets \
+  --max-pages 1 \
+  --dpi 180
+```
+
 
 
 ## 快速开始
