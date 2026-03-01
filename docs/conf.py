@@ -6,7 +6,7 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'college-swu-beamer'
+project = 'simple-swu-beamer'
 copyright = '2024, huangjunjie-cs'
 author = 'huangjunjie-cs'
 release = '0.0.1'

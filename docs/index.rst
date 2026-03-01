@@ -1,4 +1,4 @@
-.. college-swu-beamer documentation master file, created by
+.. simple-swu-beamer documentation master file, created by
    sphinx-quickstart on Fri Nov 29 13:43:04 2024.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.

@@ -209,7 +209,7 @@ CLOSE 游标名;
 \begin{itemize}
     \item 根据给定学号20180001，使用游标输出该学生的全部选课记录
 \begin{block}{}
-\begin{lstlisting}[xleftmargin=0.1\textwidth,linewidth=\textwidth]
+\begin{lstlisting}[xleftmargin=0.1\textwidth,linewidth=\linewidth]
 DECLARE
     CnoOfStudent CHAR(10);
     GradeOfStudent INT;
@@ -248,11 +248,11 @@ END;
 \end{itemize}
 \end{frame}
 
-\begin{frame}[allowframebreaks,fragile]{存储过程-创建存储过程}
-\begin{enumerate}
-    \item 创建存储过程
+\begin{frame}[fragile]{存储过程-创建存储过程}
+\begin{itemize}
+    \item 创建存储过程语法
 \begin{block}{}
-\begin{lstlisting}[linewidth=\textwidth]
+\begin{lstlisting}[linewidth=\linewidth]
 CREATE OR REPLACE PROCEDURE过程名(
     [[IN|OUT|INOUT] 参数1 数据类型,
     [IN|OUT|INOUT] 参数2 数据类型,
@@ -261,13 +261,12 @@ CREATE OR REPLACE PROCEDURE过程名(
 AS <过程化SQL块>;       /*存储过程体，描述该存储过程的操作*/
 \end{lstlisting}
 \end{block} 
-\begin{itemize}
     \item 过程名：数据库服务器合法的对象标识
-    \item 参数列表：存储过程提供了 IN、OUT、INOUT 三种参数模式，分别对应输入、输出、输入输出三种语义，不声明参数模式时，缺省为 IN 类型。输入参数在被调用时需要指定参数值，输出参数调用时不传入参数值，而是作为返回值返回。输入输出参数调用时需要传入初始值，并会返回操作后的最终值。参数列表中需要指定参数模式、参数名、以及参数的数据类型
+    \item 参数模式：IN（输入）、OUT（输出）、INOUT（输入输出），默认是 IN
+    \item 参数调用：IN 需传值，OUT 通过返回值带出，INOUT 传入初值并返回最终值
+    \item 参数定义：参数模式 + 参数名 + 数据类型
     \item 过程体：是一个<过程化SQL块>，包括声明部分和可执行语句部分 
 \end{itemize}
-\end{enumerate}
-\framebreak
 \end{frame}
 
 \begin{frame}[fragile]{存储过程-创建存储过程}
@@ -287,12 +286,15 @@ AS <过程化SQL块>;       /*存储过程体，描述该存储过程的操作*/
 \end{frame}
 
 \begin{frame}[fragile]{存储过程-创建存储过程}
+\small
 \begin{itemize}
     \item 给定学生学号，计算学生的平均学分绩点GPA
     \item 求解思路
     \begin{itemize}
-        \item “81001”课程考试成绩为85分，参照右下表，85分对应成绩范围为[80,89]，该门课程对应的学分绩点为3。类似地，课程号为“81002”对应的学分绩点为4， 课程号为“81003”对应的学分绩点为3
-        \item 81001-81003三门课程的学分都是4。根据平均学分绩点GPA的计算公式=总学分绩/总学分=（每门课程的学分*对应课程的绩点）的总和/12 = (3*4 + 4*4 + 3*4)/12 = 3.33	
+        \item 课程号“81001”成绩 85 分，对应区间 [80,89]，学分绩点为 3
+        \item 类似地，“81002”对应学分绩点为 4，“81003”对应学分绩点为 3
+        \item 三门课学分均为 4，平均学分绩点为
+        \item $\mathrm{GPA}=\frac{\sum(\text{学分}\times\text{绩点})}{\sum \text{学分}}=\frac{3\times 4 + 4\times 4 + 3\times 4}{12}=3.33$
     \end{itemize}
        \begin{figure}
         \centering
@@ -306,7 +308,7 @@ AS <过程化SQL块>;       /*存储过程体，描述该存储过程的操作*/
     \item 给定学生学号，计算学生的平均学分绩点GPA
 \end{itemize}
 \begin{block}{}
-\begin{lstlisting}[linewidth=\textwidth]
+\begin{lstlisting}[linewidth=\linewidth]
 CREATE OR REPLACE PROCEDURE compGPA(      /*定义存储过compGPA*/
     IN inSno CHAR(10),     /*输入参数：学生学号inSno*/
     OUT outGPA FLOAT)      /*输出参数：平均学分绩outGPA*/
@@ -324,7 +326,7 @@ CREATE OR REPLACE PROCEDURE compGPA(      /*定义存储过compGPA*/
 \end{block}
 \framebreak
 \begin{block}{}
-\begin{lstlisting}[firstnumber=15,linewidth=\textwidth]
+\begin{lstlisting}[firstnumber=15,linewidth=\linewidth]
     BEGIN 
         totalGPA := 0;
         totalCredit := 0;
@@ -453,5 +455,3 @@ ALTER FUNCTION 函数名 COMPILE;
 \end{enumerate}
 
 \end{frame}
-
-
